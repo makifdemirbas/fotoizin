@@ -254,13 +254,17 @@
 
                 <!-- Action Buttons Toolbar -->
                 <div class="flex flex-col sm:flex-row gap-3 pt-2">
-                    <button type="button" onclick="clearForm()" class="px-4 py-2.5 border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center justify-center space-x-2">
+                    <button type="button" onclick="clearForm()" class="px-3 py-2.5 border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center justify-center space-x-2">
                         <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                         <span>Formu Sıfırla</span>
                     </button>
-                    <button type="button" onclick="sendViaWhatsApp()" class="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow transition flex items-center justify-center space-x-2">
-                        <i data-lucide="message-square" class="w-4 h-4"></i>
-                        <span>WhatsApp İle Gönder</span>
+                    <button type="button" onclick="sendViaWhatsApp()" class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl border border-slate-300 transition flex items-center justify-center space-x-1.5" title="Özet metin gönder">
+                        <i data-lucide="message-square" class="w-4 h-4 text-emerald-600"></i>
+                        <span>Metin Gönder</span>
+                    </button>
+                    <button type="button" onclick="sendPdfViaWhatsApp()" class="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow transition flex items-center justify-center space-x-2">
+                        <i data-lucide="file-check" class="w-4 h-4"></i>
+                        <span>WhatsApp'a PDF Gönder</span>
                     </button>
                 </div>
             </form>
@@ -548,9 +552,12 @@
             }
 
             function setStrokeStyle() {
+                modalCtx.lineCap = 'round';
+                modalCtx.lineJoin = 'round';
                 if (modalTool === 'pen') {
                     modalCtx.globalCompositeOperation = 'source-over';
                     modalCtx.strokeStyle = '#0f172a';
+                    modalCtx.fillStyle = '#0f172a';
                     modalCtx.lineWidth = 2.8;
                 } else {
                     modalCtx.globalCompositeOperation = 'destination-out';
@@ -578,7 +585,14 @@
                 modalCanvas.setPointerCapture(e.pointerId);
                 setStrokeStyle();
                 const pos = getPos(e);
+                
                 modalCtx.beginPath();
+                if (modalTool === 'pen') {
+                    // Tek dokunuşta net nokta koyulabilmesi için daire çizimi yapıyoruz
+                    modalCtx.arc(pos.x, pos.y, modalCtx.lineWidth / 2, 0, Math.PI * 2);
+                    modalCtx.fill();
+                    modalCtx.beginPath();
+                }
                 modalCtx.moveTo(pos.x, pos.y);
                 modalCtx.lineTo(pos.x, pos.y);
                 modalCtx.stroke();
@@ -960,7 +974,105 @@
             }, 300);
         }
 
-        // Send contract details via WhatsApp
+        // Send contract as PDF via WhatsApp (Web Share API for mobile + auto download for desktop)
+        async function sendPdfViaWhatsApp() {
+            const phoneInput = document.getElementById('inputPhone').value.trim();
+            const fullName = document.getElementById('inputFullName').value.trim();
+            const kvkkCheck = document.getElementById('inputKvkkCheck').checked;
+
+            if (!fullName) {
+                showToast('Lütfen Model / Veli Ad Soyad alanını doldurunuz.', 'warning');
+                document.getElementById('inputFullName').focus();
+                return;
+            }
+
+            if (!kvkkCheck) {
+                showToast('Lütfen KVKK açık rıza onay kutucuğunu işaretleyiniz.', 'warning');
+                return;
+            }
+
+            if (!phoneInput) {
+                showToast('Lütfen mesajın gönderileceği telefon numarasını giriniz.', 'warning');
+                document.getElementById('inputPhone').focus();
+                return;
+            }
+
+            // Normalize phone number to international format (Turkey +90 default)
+            let cleanedPhone = phoneInput.replace(/\D/g, '');
+            if (cleanedPhone.startsWith('0')) {
+                cleanedPhone = '90' + cleanedPhone.substring(1);
+            } else if (cleanedPhone.length === 10 && cleanedPhone.startsWith('5')) {
+                cleanedPhone = '90' + cleanedPhone;
+            }
+
+            if (cleanedPhone.length < 10) {
+                showToast('Geçerli bir telefon numarası giriniz.', 'warning');
+                return;
+            }
+
+            showToast('PDF belgesi hazırlanıyor, lütfen bekleyiniz...', 'info');
+
+            try {
+                const element = document.getElementById('printableDocument');
+                const sanitizedName = fullName.replace(/[^a-zA-Z0-9çğıöşüÇĞİÖŞÜ_]/g, '_');
+                const fileName = `Foto_Cekim_Izn_KVKK_${sanitizedName}.pdf`;
+
+                const opt = {
+                    margin:       [8, 8, 8, 8],
+                    filename:     fileName,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0 },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                // Generate PDF as Blob
+                const worker = html2pdf().set(opt).from(element);
+                const pdfBlob = await worker.outputPdf('blob');
+                const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+                // Try Web Share API (Supported on iOS Safari, Android Chrome/Edge for native PDF sharing)
+                if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+                    showToast('WhatsApp / Paylaşım ekranı açılıyor...', 'success');
+                    await navigator.share({
+                        files: [pdfFile],
+                        title: 'Fotoğraf Çekim İzni ve KVKK Onam Formu',
+                        text: `Merhaba Sayın ${fullName}, Çekim İzni ve KVKK Onam Belgeniz PDF olarak ektedir.`
+                    });
+                } else {
+                    // Fallback for Desktop Browsers (Web Browsers do not support direct file injection via URL)
+                    // Step 1: Auto-download the PDF
+                    const downloadUrl = URL.createObjectURL(pdfBlob);
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(downloadUrl);
+
+                    // Step 2: Open WhatsApp Chat with pre-filled instruction text
+                    const waMessage = `Sayın *${fullName}*,
+
+Fotoğraf Çekim İzni ve KVKK Onam Belgeniz PDF olarak cihazınıza indirildi. 
+
+📌 *İndirilen Dosya:* ${fileName}
+
+Lütfen bu sohbet ekranındaki ataş (ekle) simgesine tıklayarak indirilen PDF dosyasını paylaşınız.
+
+_M. Akif Demirbaş | Freelancer Fotoğrafçılık_`;
+
+                    const waUrl = `https://api.whatsapp.com/send?phone=${cleanedPhone}&text=${encodeURIComponent(waMessage)}`;
+                    window.open(waUrl, '_blank');
+
+                    showToast('PDF cihaza indirildi ve WhatsApp sohbeti açıldı. Lütfen indirilen PDF dosyasını sohbetten ekleyiniz.', 'success', 6000);
+                }
+            } catch (err) {
+                console.error('PDF paylaşım hatası:', err);
+                showToast('PDF oluşturulurken bir hata oluştu.', 'warning');
+            }
+        }
+
+        // Send contract details via WhatsApp (Text format)
         function sendViaWhatsApp() {
             const phoneInput = document.getElementById('inputPhone').value.trim();
             const fullName = document.getElementById('inputFullName').value.trim() || 'Katılımcı';
@@ -972,7 +1084,7 @@
             const consentText = document.getElementById('inputConsentText').value.trim() || 'Okudum, anladım, kabul ediyorum.';
 
             if (!phoneInput) {
-                showToast('Lütfen önce bir telefon numarası giriniz.', 'warning');
+                showToast('Lütfen mesajın gönderileceği telefon numarasını giriniz.', 'warning');
                 document.getElementById('inputPhone').focus();
                 return;
             }
@@ -1002,7 +1114,7 @@
 
 Sayın *${modelTitle}*,
 
-Gerçekleştirilecek çekim ve dijital onay detaylarınız aşağıdadır:
+Çekim izni ve dijital onay detaylarınız aşağıdadır:
 
 📅 *Çekim Tarihi/Saat:* ${formattedDate}
 📍 *Lokasyon:* ${location}
@@ -1012,15 +1124,15 @@ Gerçekleştirilecek çekim ve dijital onay detaylarınız aşağıdadır:
 📄 *Sözleşme ve KVKK Özeti:*
 - 5846 sayılı FSEK kapsamında görsellerin sanatsal sergi, sosyal medya ve portfolyo platformlarında kullanımı.
 - 6698 sayılı KVKK kapsamında kişisel verilerin işlenmesine ilişkin açık rıza beyanı.
-- T.C. Kimlik numaranız gizli tutulacak ve 3. şahıslarla paylaşılmayacaktır.
+- T.C. Kimlik numaranız gizli tutulacaktır.
 
 ✍️ *Onay Beyanınız:* "${consentText}"
 
 _M. Akif Demirbaş | Freelancer Fotoğrafçılık_`;
 
-            const waUrl = `https://wa.me/${cleanedPhone}?text=${encodeURIComponent(message)}`;
+            const waUrl = `https://api.whatsapp.com/send?phone=${cleanedPhone}&text=${encodeURIComponent(message)}`;
             window.open(waUrl, '_blank');
-            showToast('WhatsApp yönlendirmesi yapılıyor...', 'info');
+            showToast('WhatsApp uygulamasına yönlendiriliyor...', 'success');
         }
 
         // Copy contract text to clipboard
