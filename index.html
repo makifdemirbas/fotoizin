@@ -198,7 +198,12 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Telefon Numarası</label>
-                            <input type="tel" id="inputPhone" placeholder="05XX XXX XX XX" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                            <div class="relative">
+                                <input type="tel" id="inputPhone" placeholder="05XX XXX XX XX" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition pr-10">
+                                <button type="button" onclick="sendViaWhatsApp()" class="absolute right-1.5 top-1.5 p-1 bg-green-500 hover:bg-green-600 text-white rounded-md transition" title="WhatsApp ile Hızlı Mesaj Gönder">
+                                    <i data-lucide="message-circle" class="w-4 h-4"></i>
+                                </button>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">E-posta Adresi</label>
@@ -301,10 +306,14 @@
                 </div>
 
                 <!-- Action Button Container -->
-                <div class="pt-2 flex flex-col sm:flex-row gap-3">
+                <div class="pt-2 flex flex-col sm:flex-row flex-wrap gap-3">
+                    <button type="button" onclick="sendViaWhatsApp()" class="flex-1 py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-xl shadow-md transition flex items-center justify-center space-x-2">
+                        <i data-lucide="message-circle" class="w-5 h-5"></i>
+                        <span>WhatsApp'tan Gönder</span>
+                    </button>
                     <button type="button" onclick="downloadPDF()" class="flex-1 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl shadow-md transition flex items-center justify-center space-x-2">
                         <i data-lucide="file-down" class="w-5 h-5"></i>
-                        <span>PDF Belgesi Oluştur & İndir</span>
+                        <span>PDF İndir</span>
                     </button>
                     <button type="button" onclick="printDocument()" class="py-3 px-4 bg-slate-700 hover:bg-slate-800 text-white font-medium rounded-xl transition flex items-center justify-center space-x-2">
                         <i data-lucide="printer" class="w-4 h-4"></i>
@@ -859,55 +868,79 @@
             }, 300);
         }
 
+        // Send contract details via WhatsApp
+        function sendViaWhatsApp() {
+            const phoneInput = document.getElementById('inputPhone').value.trim();
+            const fullName = document.getElementById('inputFullName').value.trim() || 'Katılımcı';
+            const shootingDateVal = document.getElementById('inputShootingDate').value;
+            const location = document.getElementById('inputLocation').value.trim() || 'Belirtilmedi';
+            const concept = document.getElementById('inputConcept').value.trim() || 'Belirtilmedi';
+            const isUnder18 = document.getElementById('inputUnder18').checked;
+            const minorName = document.getElementById('inputMinorName').value.trim();
+            const consentText = document.getElementById('inputConsentText').value.trim() || 'Okudum, anladım, kabul ediyorum.';
+
+            if (!phoneInput) {
+                showToast('Lütfen önce bir telefon numarası giriniz.', 'warning');
+                document.getElementById('inputPhone').focus();
+                return;
+            }
+
+            // Normalize phone number to international format (Turkey +90 default)
+            let cleanedPhone = phoneInput.replace(/\D/g, '');
+            if (cleanedPhone.startsWith('0')) {
+                cleanedPhone = '90' + cleanedPhone.substring(1);
+            } else if (cleanedPhone.length === 10 && cleanedPhone.startsWith('5')) {
+                cleanedPhone = '90' + cleanedPhone;
+            }
+
+            if (cleanedPhone.length < 10) {
+                showToast('Geçerli bir telefon numarası giriniz.', 'warning');
+                return;
+            }
+
+            // Format shooting date
+            let formattedDate = 'Belirtilmedi';
+            if (shootingDateVal) {
+                const dateObj = new Date(shootingDateVal);
+                formattedDate = dateObj.toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            }
+
+            const modelTitle = isUnder18 ? `${minorName} (Veli: ${fullName})` : fullName;
+
+            // Build nicely structured WhatsApp message with markdown styling
+            const message = `📸 *M. Akif Demirbaş - Fotoğraf Çekim İzni ve KVKK Onam Belgesi*
+
+Sayın *${modelTitle}*,
+
+Gerçekleştirilecek çekim ve dijital onay detaylarınız aşağıdadır:
+
+📅 *Çekim Tarihi/Saat:* ${formattedDate}
+📍 *Lokasyon:* ${location}
+🎨 *Konsept / Proje:* ${concept}
+
+----------------------------------
+📄 *Sözleşme ve KVKK Özeti:*
+- 5846 sayılı FSEK kapsamında görsellerin sanatsal sergi, sosyal medya (@fotografikya) ve portfolyolarda kullanımı.
+- 6698 sayılı KVKK kapsamında kişisel verilerin işlenmesine ilişkin açık rıza beyanı.
+- T.C. Kimlik numaranız gizli tutulacak ve 3. şahıslarla paylaşılmayacaktır.
+
+✍️ *Onay Beyanınız:* "${consentText}"
+
+_M. Akif Demirbaş | Freelancer Fotoğrafçılık_`;
+
+            // Open WhatsApp with encoded text
+            const waUrl = `https://wa.me/${cleanedPhone}?text=${encodeURIComponent(message)}`;
+            window.open(waUrl, '_blank');
+            showToast('WhatsApp yönlendirmesi yapılıyor...', 'info');
+        }
+
         // Copy text to clipboard using execCommand fallback
-        function copyDocumentText() {
-            const docElement = document.getElementById('printableDocument');
-            const textToCopy = docElement.innerText;
+<!-- ... existing code ... -->eof
+```
 
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = textToCopy;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            
-            try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    showToast('Sözleşme metni panoya kopyalandı.', 'info');
-                } else {
-                    showToast('Kopyalama gerçekleştirilemedi.', 'warning');
-                }
-            } catch (err) {
-                showToast('Kopyalama sırasında bir hata oluştu.', 'warning');
-            } finally {
-                document.body.removeChild(tempTextArea);
-            }
-        }
+Forma **"WhatsApp'tan Gönder"** butonu ve telefon alanına hızlı yönlendirme ikonu eklendi.
 
-        // Toast Notification Function
-        function showToast(message, type = 'info') {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
-            const toastIcon = document.getElementById('toastIcon');
-
-            toastMessage.innerText = message;
-
-            if (type === 'warning') {
-                toastIcon.setAttribute('data-lucide', 'alert-triangle');
-                toastIcon.className = "w-5 h-5 text-amber-400";
-            } else {
-                toastIcon.setAttribute('data-lucide', 'check-circle-2');
-                toastIcon.className = "w-5 h-5 text-emerald-400";
-            }
-            lucide.createIcons();
-
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
-    </script>
-</body>
-</html>
+### Yapılan Yenilikler:
+1. **Model Numarasına Doğrudan Mesaj:** Telefon numarası girilip butona tıklandığında, Türkiye koduna (`+90`) otomatik uyarlanarak WhatsApp sohbeti başlatılır.
+2. **Düzenli Şablon Metni:** Çekim tarihi, lokasyon, konsept, KVKK & FSEK onay özeti ve model bilgileri WhatsApp uyumlu özel biçimlendirme (`*kalın*`, satır başları vb.) ile otomatik hazırlanır.
+3. **Hızlı Erişim:** Hem ana aksiyon butonlarında hem de telefon alanının sağında hızlı erişim butonu yer almaktadır.
