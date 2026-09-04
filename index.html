@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr" class="h-full bg-slate-50">
 <head>
@@ -11,7 +10,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- html2pdf.js CDN for Direct PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- Google Fonts: Inter & Playfair Display for legal/artistic elegance -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
@@ -32,6 +31,12 @@
                             600: '#23433d',
                             700: '#1a322e',
                             900: '#0e1c1a'
+                        },
+                        whatsapp: {
+                            DEFAULT: '#25D366',
+                            dark: '#128C7E',
+                            darker: '#075E54',
+                            light: '#DCF8C6'
                         }
                     }
                 }
@@ -40,7 +45,7 @@
     </script>
 
     <style>
-        /* Custom print formatting to render clean PDF document */
+        /* Print & PDF Export Formatting */
         @media print {
             body {
                 background: white !important;
@@ -73,6 +78,13 @@
             touch-action: none;
             cursor: crosshair;
         }
+
+        /* Responsive Preview */
+        @media (max-width: 1023px) {
+            .hidden-mobile {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body class="h-full font-sans text-slate-800 antialiased flex flex-col min-h-screen">
@@ -90,19 +102,24 @@
                 </div>
             </div>
 
-            <!-- Action buttons -->
+            <!-- Quick Action Buttons -->
             <div class="flex items-center space-x-2">
                 <button onclick="togglePreviewMode()" id="previewToggleBtn" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center space-x-1.5 transition">
                     <i data-lucide="eye" class="w-4 h-4"></i>
                     <span class="hidden sm:inline" id="toggleBtnText">Önizleme / Tam Metin</span>
                 </button>
-                <button onclick="downloadPDF()" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow flex items-center space-x-1.5 transition">
-                    <i data-lucide="file-down" class="w-4 h-4"></i>
-                    <span>PDF İndir</span>
+
+                <!-- Dedicated Header WhatsApp Button -->
+                <button onclick="sharePDFViaWhatsApp()" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white shadow flex items-center space-x-1.5 transition" title="PDF'i WhatsApp ile Gönder">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                    </svg>
+                    <span>WhatsApp</span>
                 </button>
-                <button onclick="printDocument()" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center space-x-1.5 transition" title="Yazıcıdan Yazdır">
-                    <i data-lucide="printer" class="w-4 h-4"></i>
-                    <span class="hidden md:inline">Yazdır</span>
+
+                <button onclick="downloadPDF()" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center space-x-1.5 transition">
+                    <i data-lucide="file-down" class="w-4 h-4"></i>
+                    <span class="hidden md:inline">PDF İndir</span>
                 </button>
             </div>
         </div>
@@ -119,16 +136,16 @@
                 <div class="flex items-start justify-between">
                     <div>
                         <span class="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider bg-emerald-100 text-emerald-800 rounded-full">
-                            Interaktif Sözleşme
+                            WhatsApp Entegreli Form
                         </span>
-                        <h2 class="text-xl font-bold text-slate-900 mt-2">Fotoğraf Çekim İzni & KVKK Formu</h2>
+                        <h2 class="text-xl font-bold text-slate-900 mt-2">Fotoğraf Çekim İzni & KVKK Portalı</h2>
                     </div>
                     <button onclick="clearForm()" title="Formu Temizle" class="text-slate-400 hover:text-rose-600 p-1 transition">
                         <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
                     </button>
                 </div>
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    Lütfen aşağıdaki alanları eksiksiz doldurunuz. Girilen veriler anlık olarak yan taraftaki resmi sözleşme metnine işlenmektedir.
+                    Aşağıdaki bilgileri doldurup imzayı tamamladıktan sonra, oluşturulan resmi PDF belgesini <strong>doğrudan WhatsApp üzerinden</strong> modele veya ilgili kişiye gönderebilirsiniz.
                 </p>
             </div>
 
@@ -172,7 +189,7 @@
                         </label>
                     </div>
 
-                    <!-- Under 18 Notice Banner (Hidden by default) -->
+                    <!-- Under 18 Notice Banner -->
                     <div id="under18Notice" class="hidden bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800 space-y-1">
                         <p class="font-semibold flex items-center gap-1">
                             <i data-lucide="alert-circle" class="w-4 h-4 text-amber-600 inline"></i> 18 Yaş Altı Katılımcı Onayı
@@ -198,8 +215,9 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Telefon Numarası</label>
-                            <input type="tel" id="inputPhone" placeholder="05XX XXX XX XX" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">WhatsApp / Telefon No</label>
+                            <input type="tel" id="inputPhone" placeholder="05XXXXXXXXX" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                            <span class="text-[10px] text-slate-400">WhatsApp gönderimlerinde doğrudan bu numara kullanılır.</span>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">E-posta Adresi</label>
@@ -220,11 +238,10 @@
                         <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">
                             Kabul Cümlesi Onayı
                         </label>
-                        <p class="text-xs text-slate-500 mb-2">Lütfen aşağıdaki metni kutucuğa yazınız veya onay düğmesine tıklayınız:</p>
                         <div class="flex gap-2 mb-2">
                             <input type="text" id="inputConsentText" placeholder='Okudum, anladım, kabul ediyorum.' oninput="updateDocument()" class="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
                             <button type="button" onclick="autoFillConsentText()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition whitespace-nowrap">
-                                Otomatik Ekle
+                                Otomatik Doldur
                             </button>
                         </div>
                     </div>
@@ -237,7 +254,7 @@
                         </span>
                     </label>
 
-                    <!-- Interactive Signature Pads (Model & Photographer) -->
+                    <!-- Interactive Signature Pads -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <!-- Model / Guardian Canvas -->
                         <div>
@@ -256,15 +273,13 @@
                                     </button>
                                     <button type="button" onclick="clearSignature('model')" class="px-2 py-1 text-[11px] font-medium rounded bg-slate-100 hover:bg-rose-100 text-rose-600 flex items-center space-x-1 transition" title="Tümünü Temizle">
                                         <i data-lucide="trash-2" class="w-3 h-3"></i>
-                                        <span>Tümünü Temizle</span>
                                     </button>
                                 </div>
                             </div>
-
                             <div class="border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 relative overflow-hidden">
                                 <canvas id="signaturePad" class="signature-pad w-full h-32 bg-white"></canvas>
                                 <div id="signaturePlaceholder" class="absolute inset-0 pointer-events-none flex items-center justify-center text-slate-400 text-xs italic px-2 text-center">
-                                    Model / Veli İmzası...
+                                    Model / Veli İmzası Çizin...
                                 </div>
                             </div>
                         </div>
@@ -286,11 +301,9 @@
                                     </button>
                                     <button type="button" onclick="clearSignature('photo')" class="px-2 py-1 text-[11px] font-medium rounded bg-slate-100 hover:bg-rose-100 text-rose-600 flex items-center space-x-1 transition" title="Tümünü Temizle">
                                         <i data-lucide="trash-2" class="w-3 h-3"></i>
-                                        <span>Tümünü Temizle</span>
                                     </button>
                                 </div>
                             </div>
-
                             <div class="border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 relative overflow-hidden">
                                 <canvas id="photoSignaturePad" class="signature-pad w-full h-32 bg-white"></canvas>
                                 <div id="photoSignaturePlaceholder" class="absolute inset-0 pointer-events-none flex items-center justify-center text-slate-400 text-xs italic px-2 text-center">
@@ -303,44 +316,52 @@
 
                 <!-- Action Button Container -->
                 <div class="pt-2 flex flex-col sm:flex-row gap-3">
-                    <button type="button" onclick="downloadPDF()" class="flex-1 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl shadow-md transition flex items-center justify-center space-x-2">
-                        <i data-lucide="file-down" class="w-5 h-5"></i>
-                        <span>PDF Belgesi Oluştur & İndir</span>
+                    <!-- Primary WhatsApp Send Action -->
+                    <button type="button" onclick="sharePDFViaWhatsApp()" class="flex-1 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-md transition flex items-center justify-center space-x-2.5">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                        </svg>
+                        <span>WhatsApp ile Gönder (PDF)</span>
                     </button>
-                    <button type="button" onclick="printDocument()" class="py-3 px-4 bg-slate-700 hover:bg-slate-800 text-white font-medium rounded-xl transition flex items-center justify-center space-x-2">
+
+                    <button type="button" onclick="downloadPDF()" class="py-3 px-4 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-xl transition flex items-center justify-center space-x-2">
+                        <i data-lucide="file-down" class="w-4 h-4"></i>
+                        <span>PDF İndir</span>
+                    </button>
+
+                    <button type="button" onclick="printDocument()" class="py-3 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition flex items-center justify-center" title="Yazdır">
                         <i data-lucide="printer" class="w-4 h-4"></i>
-                        <span>Yazdır</span>
                     </button>
-                    <button type="button" onclick="copyDocumentText()" class="py-3 px-4 bg-slate-200 hover:bg-slate-300 text-slate-800 font-medium rounded-xl transition flex items-center justify-center space-x-2">
+
+                    <button type="button" onclick="copyDocumentText()" class="py-3 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition" title="Metni Kopyala">
                         <i data-lucide="copy" class="w-4 h-4"></i>
-                        <span>Kopyala</span>
                     </button>
                 </div>
             </form>
         </section>
 
-        <!-- RIGHT PANEL: Live PDF / Print Document Preview -->
+        <!-- RIGHT PANEL: Live PDF / Printable Document Preview -->
         <section id="previewPanel" class="lg:col-span-6">
             <div class="sticky top-20">
                 <div class="mb-2 flex items-center justify-between no-print">
                     <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center space-x-1">
                         <i data-lucide="file-text" class="w-4 h-4"></i>
-                        <span>Canlı Belge Görünümü</span>
+                        <span>Resmi Belge Önizlemesi</span>
                     </span>
-                    <span class="text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-medium">
-                        Senkronize
+                    <span class="text-xs text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Canlı Senkronize
                     </span>
                 </div>
 
-                <!-- Legal Printable Sheet -->
+                <!-- Printable Sheet / PDF Render Node -->
                 <div id="printableDocument" class="document-container bg-white rounded-xl shadow-xl border border-slate-200 p-6 sm:p-10 text-slate-900 text-xs sm:text-sm space-y-6 leading-relaxed relative">
-
                     <!-- Watermark Logo Accent -->
                     <div class="absolute top-6 right-6 opacity-10 pointer-events-none no-print">
                         <i data-lucide="camera" class="w-24 h-24 text-slate-900"></i>
                     </div>
 
-                    <!-- Document Title Header -->
+                    <!-- Document Header -->
                     <div class="border-b-2 border-slate-900 pb-4 text-center space-y-1">
                         <h2 class="font-serif font-bold text-base sm:text-xl tracking-wider text-slate-900 uppercase">FOTOĞRAF ÇEKİM İZİN VE KVKK ONAM FORMU</h2>
                         <p class="font-medium text-slate-700 text-xs sm:text-sm">M. Akif Demirbaş | Freelancer Fotoğrafçılık</p>
@@ -359,35 +380,26 @@
 
                         <!-- Shoot Specs Box -->
                         <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-1 text-xs">
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-1">
-                                <div><strong class="text-slate-900">Çekim Tarihi/Saat:</strong> <span id="docShootingDate" class="text-slate-700">-</span></div>
-                                <div><strong class="text-slate-900">Lokasyon / Mekân:</strong> <span id="docLocation" class="text-slate-700">-</span></div>
-                                <div><strong class="text-slate-900">Konsept / Proje:</strong> <span id="docConcept" class="text-slate-700">-</span></div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                <div><strong class="text-slate-900">Çekim Tarihi/Saat:</strong> <br><span id="docShootingDate" class="text-slate-700">-</span></div>
+                                <div><strong class="text-slate-900">Lokasyon / Mekân:</strong> <br><span id="docLocation" class="text-slate-700">-</span></div>
+                                <div><strong class="text-slate-900">Konsept / Proje:</strong> <br><span id="docConcept" class="text-slate-700">-</span></div>
                             </div>
                         </div>
 
                         <!-- Articles -->
                         <div class="space-y-2 text-slate-700">
                             <p>
-                                <strong>Madde 1: Kapsam ve Materyal Tanımı</strong><br>
-                                Model, işbu sözleşme kapsamında gerçekleştirilecek olan fotoğraf çekimleri sırasında elde edilen her türlü fotoğraf, portre, dijital görüntü ve benzeri görsel materyallerin ("Materyaller") Fotoğrafçı tarafından işlenmesine, saklanmasına ve aşağıda belirtilen mecralarda kullanımına muvafakat eder.
+                                <strong>Madde 1: Kapsam ve Materyal Tanımı:</strong> Model, işbu sözleşme kapsamında gerçekleştirilecek fotoğraf çekimleri sırasında elde edilen her türlü fotoğraf, portre, dijital görüntü ve benzeri görsel materyallerin ("Materyaller") Fotoğrafçı tarafından işlenmesine, saklanmasına ve aşağıda belirtilen mecralarda kullanımına muvafakat eder.
                             </p>
                             <p>
-                                <strong>Madde 2: Kullanım Alanları ve Mecralar</strong><br>
-                                Fotoğrafçı, işbu sözleşme çerçevesinde üretilen materyalleri aşağıdaki alanlarda münhasıran veya genel tanıtım amaçlı kullanma hakkına sahiptir:
-                            </p>
-                            <ul class="list-disc pl-5 space-y-1 text-slate-600">
-                                <li><strong>Sanatsal ve Kültürel Faaliyetler:</strong> Ulusal veya uluslararası düzeyde düzenlenecek olan fotoğraf sergileri, bienaller, sanat galerisi gösterimleri ve kültürel projeler.</li>
-                                <li><strong>Dijital ve Sosyal Medya:</strong> Fotoğrafçıya ait resmi Instagram hesapları (@fotografikya ve kişisel profesyonel hesaplar) dahil olmak üzere tüm dijital platformlar, web siteleri, çevrim içi portfolyolar ve bloglar.</li>
-                                <li><strong>Basılı Yayınlar ve Tanıtım:</strong> Kataloglar, dergiler, sanat kitapları, basın bültenleri ve tanıtım broşürleri.</li>
-                            </ul>
-                            <p>
-                                <strong>Madde 3: Maddi Haklar, Telif ve Ücretlendirme</strong><br>
-                                Model, çekilen fotoğraflar üzerinde 5846 sayılı Fikir ve Sanat Eserleri Kanunu (FSEK) hükümleri gereğince herhangi bir telif ücreti, royalty, pay veya ek maddi menfaat talebinde bulunmayacağını, yapılan çekimin sanatsal ve mesleki iş birliği niteliği taşıdığını gayrikabili rücu kabul ve beyan eder.
+                                <strong>Madde 2: Kullanım Alanları ve Mecralar:</strong> Fotoğrafçı, işbu sözleşme çerçevesinde üretilen materyalleri sergilerde, fotoğrafçının resmi sosyal medya hesaplarında (@fotografikya ve kişisel portfolyo), web sitesinde ve basılı tanıtım bültenlerinde sanatsal ve portfolyo tanıtım amacıyla kullanma hakkına sahiptir.
                             </p>
                             <p>
-                                <strong>Madde 4: Mali Hakların Devri ve Lisans</strong><br>
-                                Model; umuma arz, yayma, işleme ve dijital iletim hakları dahil olmak üzere FSEK'ten doğan tüm mali hakların işbu sözleşme sınırları dahilinde, herhangi bir coğrafi ve süre sınırlamasına tabi olmaksızın Fotoğrafçı tarafından kullanılmasına izin vermiştir.
+                                <strong>Madde 3: Maddi Haklar ve Telif:</strong> Model, çekilen fotoğraflar üzerinde 5846 sayılı Fikir ve Sanat Eserleri Kanunu (FSEK) hükümleri gereğince herhangi bir telif ücreti veya royalty talebinde bulunmayacağını, çekimin sanatsal iş birliği niteliğinde olduğunu gayrikabili rücu kabul ve beyan eder.
+                            </p>
+                            <p>
+                                <strong>Madde 4: Mali Hakların Devri:</strong> Model; umuma arz, işleme ve dijital iletim hakları dahil tüm mali hakların belirtilen mecralarla sınırlı kalmak kaydıyla Fotoğrafçı tarafından süresiz ve coğrafi sınırlama olmaksızın kullanılmasına izin vermiştir.
                             </p>
                         </div>
                     </div>
@@ -395,21 +407,17 @@
                     <!-- BÖLÜM 2 -->
                     <div class="space-y-3 pt-2 border-t border-slate-200">
                         <h3 class="font-bold text-slate-900 uppercase tracking-wide border-l-2 border-brand-500 pl-2 text-xs sm:text-sm">
-                            BÖLÜM 2: 6698 Sayılı Kişisel Verilerin Korunması Kanunu (KVKK) Aydınlatma Metni
+                            BÖLÜM 2: 6698 Sayılı KVKK Aydınlatma ve Açık Rıza Metni
                         </h3>
-                        <p class="text-slate-700 text-justify leading-normal">
-                            6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") ve ilgili ikincil mevzuat hükümleri gereğince, fotoğraf çekimi ve sonrasındaki sanatsal/tanıtım faaliyetleri sürecinde elde edilen kimlik ve görsel nitelikteki kişisel verilerinizin işlenme süreçleri hakkında bilgilendirme metnidir.
-                        </p>
-                        
                         <div class="space-y-2 text-slate-700">
                             <p>
-                                <strong>1. Veri Sorumlusunun Kimliği ve İletişim:</strong> Fotoğraf çekim faaliyetini yürüten ve kişisel verilerinizi veri sorumlusu sıfatıyla işleyen taraf, bağımsız fotoğrafçı M. Akif Demirbaş'tır.
+                                <strong>1. Veri Sorumlusu:</strong> Veri sorumlusu sıfatıyla hareket eden taraf bağımsız fotoğrafçı M. Akif Demirbaş'tır.
                             </p>
                             <p>
-                                <strong>2. Kişisel Verilerin İşlenme Amaçları, Gizliliği ve Güvenliği:</strong> Toplanan kişisel verileriniz (ad-soyad, iletişim bilgileri, fotoğraf kayıtları); fotoğraf çekimi organizasyonlarının planlanması, elde edilen sanatsal görsellerin arşivlenmesi, portfolyo yönetimi, Instagram hesaplarında ve sanatsal sergilerde kamuoyuna sunulması amaçlarıyla KVKK'nın 5. maddesi gereğince işlenmektedir. Formda yer alan T.C. Kimlik Numarası bilgisi yalnızca hukuki geçerliliğin sağlanması, tarafların tespiti ve arşivleme amacıyla fotoğrafçı (M. Akif Demirbaş) nezdinde saklı tutulacak olup, hiçbir surette üçüncü kişi, kurum ya da kuruluşlarla paylaşılmayacaktır.
+                                <strong>2. Kişisel Verilerin Güvenliği & Gizlilik:</strong> Toplanan kimlik ve görsel verileriniz portfolyo sunumu, arşivleme ve Instagram yayınları amacıyla işlenmektedir. <strong>Formda alınan T.C. Kimlik Numarası yalnızca sözleşmenin hukuki geçerliliği ve taraf teyidi amacıyla saklanacak olup kesinlikle üçüncü şahıs veya kurumlarla paylaşılmayacaktır.</strong>
                             </p>
                             <p class="bg-emerald-50 p-2.5 rounded border border-emerald-200 text-emerald-900 font-medium">
-                                <strong>3. Açık Rıza Beyanı:</strong> İşbu aydınlatma metnini okuduğumu, anladığımı ve 6698 sayılı KVKK kapsamında kişisel verilerimin yukarıda belirtilen amaçlarla işlenmesine, arşivlenmesine, Instagram platformunda ve sanatsal sergilerde yayınlanmasına yönelik açık rızamı, T.C. Kimlik Numaramın gizli tutulacağı ve üçüncü taraflarla paylaşılmayacağı güvencesiyle hiçbir baskı altında kalmaksızın, tamamen özgür irademle verdiğimi kabul, beyan ve taahhüt ederim.
+                                <strong>3. Açık Rıza Beyanı:</strong> Fotoğraflarımın yukarıdaki amaçlarla işlenmesine, arşivlenmesine ve @fotografikya Instagram sayfasında yayınlanmasına özgür irademle açık rıza gösterdiğimi kabul ve taahhüt ederim.
                             </p>
                         </div>
                     </div>
@@ -417,14 +425,11 @@
                     <!-- BÖLÜM 3 -->
                     <div class="space-y-4 pt-2 border-t border-slate-200">
                         <h3 class="font-bold text-slate-900 uppercase tracking-wide border-l-2 border-brand-500 pl-2 text-xs sm:text-sm">
-                            BÖLÜM 3: Son Hükümler ve İmzalar
+                            BÖLÜM 3: Taraf İmzaları
                         </h3>
-                        <p class="text-slate-700">
-                            İşbu form, tarafların haklarını güvence altına alan maddeleri içeren bu metnin okunması ve onaylanmasıyla karşılıklı olarak yürürlüğe girer.
-                        </p>
 
                         <!-- Signatures Grid -->
-                        <div class="grid grid-cols-2 gap-6 pt-2">
+                        <div class="grid grid-cols-2 gap-6 pt-1">
                             <!-- Model / Guardian Column -->
                             <div class="border border-slate-200 rounded-lg p-3 space-y-2 bg-slate-50/50">
                                 <h4 class="font-bold text-slate-900 underline text-xs uppercase" id="docSignerHeader">Model / Katılımcı</h4>
@@ -432,8 +437,7 @@
                                     <p><strong>Adı Soyadı:</strong> <span id="docFullName">-</span></p>
                                     <p id="docMinorNameBox" class="hidden text-amber-800"><strong>Küçük Katılımcı:</strong> <span id="docMinorName">-</span></p>
                                     <p><strong>T.C. Kimlik No:</strong> <span id="docTcNo">-</span></p>
-                                    <p class="text-[10px] text-slate-500 italic">T.C. Kimlik No resmi geçerlilik için alınmakta olup üçüncü şahıslarla paylaşılmaz.</p>
-                                    <p><strong>Tel / E-posta:</strong> <span id="docContact">-</span></p>
+                                    <p><strong>İletişim:</strong> <span id="docContact">-</span></p>
                                     <p><strong>Tarih:</strong> <span id="docSignDate">-</span></p>
                                     <p><strong>Onay Metni:</strong> <span id="docConsentText" class="italic text-brand-600 font-semibold">"Okudum, anladım, kabul ediyorum."</span></p>
                                 </div>
@@ -453,7 +457,7 @@
                                 <h4 class="font-bold text-slate-900 underline text-xs uppercase">Fotoğrafçı</h4>
                                 <div class="space-y-1 text-xs text-slate-700">
                                     <p><strong>Adı Soyadı:</strong> M. Akif Demirbaş</p>
-                                    <p><strong>Faaliyet Alanı:</strong> Freelancer Fotoğrafçılık</p>
+                                    <p><strong>Faaliyet:</strong> Freelancer Fotoğrafçı</p>
                                     <p><strong>Instagram:</strong> @fotografikya</p>
                                     <p><strong>Tarih:</strong> <span id="docPhotographerDate">-</span></p>
                                 </div>
@@ -474,15 +478,56 @@
 
                         <!-- Under 18 Footer Note -->
                         <p class="text-[10px] text-slate-500 border-t border-slate-100 pt-2 italic">
-                            * Önemli Not: Modelin 18 yaşından küçük olması durumunda, işbu formun "Model/Katılımcı" alanı yasal velisi veya vasisi tarafından imzalanmalı ve kimlik bilgileri veli adına doldurulmalıdır.
+                            * Katılımcının 18 yaşından küçük olması durumunda yasal veli/vasi onayı ve imzası zorunludur.
                         </p>
                     </div>
-
                 </div>
             </div>
         </section>
-
     </main>
+
+    <!-- WhatsApp Share Guidance Modal (Fallback for Desktop or non-native share) -->
+    <div id="whatsappModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100 animate-in fade-in zoom-in duration-200">
+            <div class="flex items-center space-x-3 text-emerald-600">
+                <div class="bg-emerald-100 p-2.5 rounded-xl">
+                    <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-900 text-base">PDF İndirildi & WhatsApp Hazır!</h3>
+                    <p class="text-xs text-slate-500">Masaüstü ve tarayıcı yönlendirmesi</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-700 space-y-2">
+                <p class="font-semibold text-slate-900 flex items-center gap-1.5">
+                    <span class="w-5 h-5 bg-emerald-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold">1</span>
+                    PDF cihazınıza başarıyla indirildi.
+                </p>
+                <p class="font-semibold text-slate-900 flex items-center gap-1.5">
+                    <span class="w-5 h-5 bg-emerald-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold">2</span>
+                    Aşağıdaki butona basarak WhatsApp sohbetini açınız.
+                </p>
+                <p class="text-slate-500 pl-6">
+                    Açılan WhatsApp sohbetinde ataç/ekle butonuna basarak indirdiğiniz PDF dosyasını sohbete ekleyip gönderebilirsiniz.
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-2 pt-2">
+                <button id="modalOpenWhatsAppBtn" type="button" class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition flex items-center justify-center space-x-2">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                    </svg>
+                    <span>WhatsApp Sohbetini Aç</span>
+                </button>
+                <button type="button" onclick="closeModal()" class="w-full py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-xs transition">
+                    Pencereyi Kapat
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Custom Toast Message Notification -->
     <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
@@ -518,10 +563,9 @@
             const ctx = canvas.getContext('2d', { willReadFrequently: true });
             
             let isDrawing = false;
-            let currentTool = 'pen'; // 'pen' or 'eraser'
+            let currentTool = 'pen';
 
             function resize() {
-                // Save canvas content
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = canvas.width;
                 tempCanvas.height = canvas.height;
@@ -544,7 +588,6 @@
                 }
             }
 
-            // Check if canvas has non-transparent pixels
             function checkBlank() {
                 const pixelData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
                 for (let i = 3; i < pixelData.length; i += 4) {
@@ -666,7 +709,6 @@
             if (photoCanvasObj) photoCanvasObj.resize();
         });
 
-        // Switch active drawing tool (Pen / Eraser)
         function setTool(type, tool) {
             if (type === 'model' && modelCanvasObj) {
                 modelCanvasObj.setTool(tool);
@@ -677,14 +719,13 @@
             }
         }
 
-        // Clear signature helper
         function clearSignature(type) {
             if (type === 'model' && modelCanvasObj) {
                 modelCanvasObj.clear();
-                showToast('Model imza alanı tamamen temizlendi.', 'info');
+                showToast('Model imza alanı temizlendi.', 'info');
             } else if (type === 'photo' && photoCanvasObj) {
                 photoCanvasObj.clear();
-                showToast('Fotoğrafçı imza alanı tamamen temizlendi.', 'info');
+                showToast('Fotoğrafçı imza alanı temizlendi.', 'info');
             }
         }
 
@@ -701,7 +742,6 @@
             const concept = document.getElementById('inputConcept').value.trim();
             const consentText = document.getElementById('inputConsentText').value.trim();
 
-            // Format date for display
             let formattedDate = '-';
             let formattedDateOnly = '-';
             if (shootingDateVal) {
@@ -710,7 +750,6 @@
                 formattedDateOnly = dateObj.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
             }
 
-            // Update main model name display in agreement intro
             const modelDisplay = isUnder18 
                 ? (minorName ? `${minorName} (Velisi: ${fullName || '...'})` : (fullName ? `[Katılımcı] (Velisi: ${fullName})` : '[Model Adı Soyadı]'))
                 : (fullName || '[Model Adı Soyadı]');
@@ -720,7 +759,6 @@
             document.getElementById('docLocation').innerText = location || '-';
             document.getElementById('docConcept').innerText = concept || '-';
 
-            // Update Signer Info
             document.getElementById('docFullName').innerText = fullName || '-';
             document.getElementById('docTcNo').innerText = tcNo || '-';
             document.getElementById('docContact').innerText = [phone, email].filter(Boolean).join(' / ') || '-';
@@ -741,7 +779,6 @@
             }
         }
 
-        // Toggle Under 18 Mode
         function toggleUnder18Mode() {
             const isUnder18 = document.getElementById('inputUnder18').checked;
             const notice = document.getElementById('under18Notice');
@@ -764,18 +801,15 @@
                 lblTcNo.innerText = "T.C. Kimlik No";
                 docSignerHeader.innerText = "Model / Katılımcı";
             }
-
             updateDocument();
         }
 
-        // Auto Fill Consent Text
         function autoFillConsentText() {
             document.getElementById('inputConsentText').value = "Okudum, anladım, kabul ediyorum.";
             updateDocument();
             showToast('Onay metni eklendi.', 'info');
         }
 
-        // Clear Form Fields
         function clearForm() {
             document.getElementById('interactiveForm').reset();
             clearSignature('model');
@@ -785,7 +819,6 @@
             showToast('Form verileri temizlendi.', 'info');
         }
 
-        // Toggle Mobile Full Preview Mode
         function togglePreviewMode() {
             const previewPanel = document.getElementById('previewPanel');
             const formPanel = document.getElementById('formPanel');
@@ -802,7 +835,23 @@
             }
         }
 
-        // Direct PDF Generation using html2pdf.js
+        // Generate standard filename and PDF options
+        function getPdfConfig() {
+            const fullName = document.getElementById('inputFullName').value.trim() || 'Model';
+            const sanitizedName = fullName.replace(/[^a-zA-Z0-9çğıöşüÇĞİÖŞÜ_]/g, '_');
+            const filename = `Foto_Cekim_Izni_KVKK_${sanitizedName}.pdf`;
+
+            const opt = {
+                margin:       [8, 8, 8, 8],
+                filename:     filename,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            return { filename, opt };
+        }
+
+        // Standard PDF Download
         function downloadPDF() {
             const fullName = document.getElementById('inputFullName').value.trim();
             const kvkkCheck = document.getElementById('inputKvkkCheck').checked;
@@ -811,35 +860,110 @@
                 showToast('Lütfen Model / Veli Ad Soyad alanını doldurunuz.', 'warning');
                 return;
             }
-
             if (!kvkkCheck) {
                 showToast('Lütfen KVKK açık rıza onay kutucuğunu işaretleyiniz.', 'warning');
                 return;
             }
 
             showToast('PDF belgesi oluşturuluyor, lütfen bekleyiniz...', 'info');
-
             const element = document.getElementById('printableDocument');
-            const sanitizedName = fullName.replace(/[^a-zA-Z0-9çğıöşüÇĞİÖŞÜ_]/g, '_');
-            
-            const opt = {
-                margin:       [8, 8, 8, 8],
-                filename:     `Foto_Cekim_Izn_KVKK_${sanitizedName}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
+            const { opt } = getPdfConfig();
 
-            // Execute client-side PDF generation
             html2pdf().set(opt).from(element).save().then(() => {
-                showToast('PDF dosyası başarıyla oluşturuldu ve indirildi.', 'info');
+                showToast('PDF dosyası başarıyla indirildi.', 'info');
             }).catch(err => {
                 console.error('PDF üretme hatası:', err);
                 showToast('PDF oluşturulurken bir hata oluştu.', 'warning');
             });
         }
 
-        // Dedicated Print Function
+        // WHATSAPP SHARE IMPLEMENTATION
+        async function sharePDFViaWhatsApp() {
+            const fullName = document.getElementById('inputFullName').value.trim();
+            const kvkkCheck = document.getElementById('inputKvkkCheck').checked;
+            const rawPhone = document.getElementById('inputPhone').value.trim();
+            const concept = document.getElementById('inputConcept').value.trim() || 'Fotoğraf Çekimi';
+            const location = document.getElementById('inputLocation').value.trim() || 'Belirtilmedi';
+            const dateStr = document.getElementById('docShootingDate').innerText;
+
+            if (!fullName) {
+                showToast('Lütfen Model / Veli Ad Soyad alanını doldurunuz.', 'warning');
+                return;
+            }
+            if (!kvkkCheck) {
+                showToast('Lütfen KVKK açık rıza onay kutucuğunu işaretleyiniz.', 'warning');
+                return;
+            }
+
+            showToast('PDF WhatsApp için hazırlanıyor...', 'info');
+
+            // Format phone number for WhatsApp wa.me link
+            let cleanPhone = rawPhone.replace(/[^0-9]/g, '');
+            if (cleanPhone.startsWith('0')) {
+                cleanPhone = '90' + cleanPhone.substring(1);
+            } else if (cleanPhone.length === 10) {
+                cleanPhone = '90' + cleanPhone;
+            }
+
+            const messageText = `Sayın ${fullName},\n\nM. Akif Demirbaş ile gerçekleştirilen çekime ait "Fotoğraf Çekim İzni ve KVKK Onam Formu" düzenlenmiştir.\n\n📅 Çekim Tarihi: ${dateStr}\n📍 Mekân: ${location}\n📷 Konsept: ${concept}\n\nİmzalı PDF belgeniz ektedir.`;
+            const encodedMsg = encodeURIComponent(messageText);
+            const waUrl = cleanPhone 
+                ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodedMsg}`
+                : `https://api.whatsapp.com/send?text=${encodedMsg}`;
+
+            const element = document.getElementById('printableDocument');
+            const { filename, opt } = getPdfConfig();
+
+            try {
+                // Generate PDF as Blob
+                const worker = html2pdf().from(element).set(opt);
+                const pdfBlob = await worker.output('blob');
+                const pdfFile = new File([pdfBlob], filename, { type: 'application/pdf' });
+
+                // Check if device supports Web Share API with files (Mobile Chrome, iOS Safari, etc.)
+                if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+                    try {
+                        await navigator.share({
+                            files: [pdfFile],
+                            title: 'Fotoğraf Çekim İzni ve KVKK Onam Formu',
+                            text: messageText
+                        });
+                        showToast('Belge paylaşım menüsüne aktarıldı. WhatsApp seçebilirsiniz.', 'info');
+                        return;
+                    } catch (shareErr) {
+                        if (shareErr.name === 'AbortError') {
+                            // User cancelled share dialog
+                            return;
+                        }
+                        console.warn('Share API error, trying fallback:', shareErr);
+                    }
+                }
+
+                // Fallback for Desktop Browsers / Unsupported Share API:
+                // 1. Download the PDF directly so user has the file
+                await html2pdf().set(opt).from(element).save();
+
+                // 2. Setup and display WhatsApp Guidance Modal
+                const openBtn = document.getElementById('modalOpenWhatsAppBtn');
+                openBtn.onclick = function() {
+                    window.open(waUrl, '_blank');
+                    closeModal();
+                };
+
+                document.getElementById('whatsappModal').classList.remove('hidden');
+                showToast('PDF indirildi. WhatsApp sohbetine ekleyebilirsiniz.', 'info');
+
+            } catch (err) {
+                console.error('WhatsApp paylaşım hatası:', err);
+                showToast('PDF hazırlanırken hata oluştu. Doğrudan PDF İndir seçeneğini kullanabilirsiniz.', 'warning');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('whatsappModal').classList.add('hidden');
+        }
+
+        // Print function
         function printDocument() {
             const fullName = document.getElementById('inputFullName').value.trim();
             const kvkkCheck = document.getElementById('inputKvkkCheck').checked;
@@ -848,7 +972,6 @@
                 showToast('Lütfen Model / Veli Ad Soyad alanını doldurunuz.', 'warning');
                 return;
             }
-
             if (!kvkkCheck) {
                 showToast('Lütfen KVKK açık rıza onay kutucuğunu işaretleyiniz.', 'warning');
                 return;
@@ -860,7 +983,7 @@
             }, 300);
         }
 
-        // Copy text to clipboard using execCommand fallback
+        // Copy text to clipboard
         function copyDocumentText() {
             const docElement = document.getElementById('printableDocument');
             const textToCopy = docElement.innerText;
@@ -884,7 +1007,7 @@
             }
         }
 
-        // Toast Notification Function
+        // Toast notification helper
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
@@ -907,7 +1030,7 @@
             setTimeout(() => {
                 toast.classList.remove('translate-y-0', 'opacity-100');
                 toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+            }, 3200);
         }
     </script>
 </body>
