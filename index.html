@@ -1,186 +1,209 @@
+
 <!DOCTYPE html>
-<html lang="tr" class="h-full bg-slate-100">
+<html lang="tr" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fotoğraf Çekim İzni ve KVKK Onam Formu</title>
+    <title>Fotoğraf Çekim İzni ve KVKK Onam Formu - M. Akif Demirbaş</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- html2pdf.js CDN for Direct PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Google Fonts: Inter & Playfair Display for legal/artistic elegance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0284c7',
-                            600: '#0369a1',
-                            700: '#075985',
-                            800: '#0c4a6e',
-                            900: '#0f172a',
-                        }
-                    },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
-                        serif: ['Georgia', 'serif']
+                        serif: ['Cinzel', 'serif']
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f4f7f6',
+                            100: '#e3ebe8',
+                            500: '#2c534c',
+                            600: '#23433d',
+                            700: '#1a322e',
+                            900: '#0e1c1a'
+                        }
                     }
                 }
             }
         }
     </script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- html2pdf.js for client-side PDF generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        
+        /* Custom print formatting to render clean PDF document */
         @media print {
-            .no-print { display: none !important; }
-            .print-only { display: block !important; }
-            body { background: white !important; color: black !important; }
-            #printableDocument {
-                border: none !important;
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .print-page-break {
+                page-break-before: always;
+            }
+            .document-container {
                 box-shadow: none !important;
+                border: none !important;
                 padding: 0 !important;
                 margin: 0 !important;
                 width: 100% !important;
+                max-width: 100% !important;
             }
         }
-
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+        .print-only {
+            display: none;
         }
         
-        /* Smooth transition for mobile view toggle */
-        @media (max-width: 1023px) {
-            .hidden-mobile { display: none !important; }
+        /* Signature canvas styling */
+        canvas.signature-pad {
+            touch-action: none;
+            cursor: crosshair;
         }
     </style>
 </head>
-<body class="h-full text-slate-800 antialiased selection:bg-brand-500 selection:text-white flex flex-col">
+<body class="h-full font-sans text-slate-800 antialiased flex flex-col min-h-screen">
 
-    <!-- TOP NAVBAR -->
-    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 no-print">
+    <!-- Application Header -->
+    <header class="no-print bg-slate-900 text-white sticky top-0 z-40 shadow-md border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="p-2 bg-brand-500 rounded-xl text-white shadow-lg shadow-brand-500/30">
-                    <i data-lucide="camera" class="w-5 h-5"></i>
+                <div class="bg-brand-500 p-2 rounded-lg text-white">
+                    <i data-lucide="camera" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-sm sm:text-base tracking-tight leading-tight">Çekim İzni ve KVKK Onam Formu</h1>
-                    <p class="text-[11px] text-slate-400">M. Akif Demirbaş — Freelancer Fotoğrafçılık Portfolyosu</p>
+                    <h1 class="font-bold text-base sm:text-lg leading-tight">M. Akif Demirbaş</h1>
+                    <p class="text-xs text-slate-400">Freelancer Fotoğrafçılık &bull; Dijital Onam Portalı</p>
                 </div>
             </div>
 
-            <!-- Mobile View Switch Button -->
-            <button onclick="togglePreviewMode()" class="lg:hidden px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 flex items-center space-x-1.5 transition">
-                <i data-lucide="eye" class="w-4 h-4 text-brand-500"></i>
-                <span id="toggleBtnText">Önizleme / Tam Metin</span>
-            </button>
+            <!-- Action buttons -->
+            <div class="flex items-center space-x-2">
+                <button onclick="togglePreviewMode()" id="previewToggleBtn" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center space-x-1.5 transition">
+                    <i data-lucide="eye" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline" id="toggleBtnText">Önizleme / Tam Metin</span>
+                </button>
+                <button onclick="downloadPDF()" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow flex items-center space-x-1.5 transition">
+                    <i data-lucide="file-down" class="w-4 h-4"></i>
+                    <span>PDF İndir</span>
+                </button>
+                <button onclick="printDocument()" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center space-x-1.5 transition" title="Yazıcıdan Yazdır">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    <span class="hidden md:inline">Yazdır</span>
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- MAIN TWO-COLUMN CONTAINER -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 overflow-hidden">
-        
-        <!-- LEFT COLUMN: FORM INPUTS & SIGNATURE CONTROLS -->
-        <section id="formPanel" class="lg:col-span-5 space-y-6 overflow-y-auto custom-scrollbar max-h-[calc(100vh-6rem)] pr-1 no-print">
-            
-            <form id="interactiveForm" onsubmit="event.preventDefault();" class="space-y-5">
-                
-                <!-- SECTION 1: PARTICIPANT TYPE & MODEL INFORMATION -->
-                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                        <div class="flex items-center space-x-2">
-                            <i data-lucide="user-check" class="w-5 h-5 text-brand-500"></i>
-                            <h3 class="font-semibold text-slate-900 text-base">1. Katılımcı ve Model Bilgileri</h3>
-                        </div>
+    <!-- Main Workspace Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <!-- LEFT PANEL: Interactive Form Fill Section -->
+        <section id="formPanel" class="lg:col-span-6 space-y-6">
+
+            <!-- Welcome & Quick Info Banner -->
+            <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <span class="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider bg-emerald-100 text-emerald-800 rounded-full">
+                            Interaktif Sözleşme
+                        </span>
+                        <h2 class="text-xl font-bold text-slate-900 mt-2">Fotoğraf Çekim İzni & KVKK Formu</h2>
                     </div>
-
-                    <!-- Under 18 Toggle Switch -->
-                    <div class="bg-amber-50/80 border border-amber-200 rounded-xl p-3 flex items-start space-x-3">
-                        <input type="checkbox" id="inputUnder18" onchange="toggleUnder18Mode()" class="mt-1 w-4 h-4 text-brand-500 rounded border-slate-300 focus:ring-brand-500 cursor-pointer">
-                        <label for="inputUnder18" class="text-xs text-amber-900 cursor-pointer select-none leading-relaxed">
-                            <strong>Model 18 Yaşından Küçük mü?</strong><br>
-                            İşaretlendiği takdirde veli / vasi bilgileri talep edilecek ve onay veli tarafından verilecektir.
-                        </label>
-                    </div>
-
-                    <!-- Dynamic Input Fields -->
-                    <div class="space-y-3">
-                        <!-- Minor Name Field (Conditional) -->
-                        <div id="minorNameRow" class="hidden">
-                            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                                Reşit Olmayan Modelin Adı Soyadı <span class="text-rose-500">*</span>
-                            </label>
-                            <input type="text" id="inputMinorName" placeholder="Örn: Ahmet Yılmaz" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
-                        </div>
-
-                        <!-- Full Name (Model or Guardian) -->
-                        <div>
-                            <label id="lblFullName" class="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                                Model Adı Soyadı <span class="text-rose-500">*</span>
-                            </label>
-                            <input type="text" id="inputFullName" placeholder="Ad Soyad giriniz" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
-                        </div>
-
-                        <!-- TC Identification No -->
-                        <div>
-                            <label id="lblTcNo" class="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                                T.C. Kimlik No
-                            </label>
-                            <input type="text" id="inputTcNo" maxlength="11" placeholder="11 haneli T.C. Kimlik No" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
-                        </div>
-
-                        <!-- Contact Details -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Telefon</label>
-                                <input type="tel" id="inputPhone" placeholder="05XX XXX XX XX" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">E-Posta</label>
-                                <input type="email" id="inputEmail" placeholder="ornek@email.com" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
-                            </div>
-                        </div>
-                    </div>
+                    <button onclick="clearForm()" title="Formu Temizle" class="text-slate-400 hover:text-rose-600 p-1 transition">
+                        <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                    </button>
                 </div>
+                <p class="text-xs text-slate-600 leading-relaxed">
+                    Lütfen aşağıdaki alanları eksiksiz doldurunuz. Girilen veriler anlık olarak yan taraftaki resmi sözleşme metnine işlenmektedir.
+                </p>
+            </div>
 
-                <!-- SECTION 2: SHOOT DETAILS -->
+            <form id="interactiveForm" onsubmit="event.preventDefault();" class="space-y-6">
+
+                <!-- SECTION 1: SHOOT DETAILS -->
                 <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
                     <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
                         <i data-lucide="calendar" class="w-5 h-5 text-brand-500"></i>
-                        <h3 class="font-semibold text-slate-900 text-base">2. Çekim ve Proje Detayları</h3>
+                        <h3 class="font-semibold text-slate-900 text-base">1. Çekim Detayları</h3>
                     </div>
 
-                    <div class="space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Çekim Tarihi ve Saati</label>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Çekim Tarihi & Saati</label>
                             <input type="datetime-local" id="inputShootingDate" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Çekim Lokasyonu</label>
-                            <input type="text" id="inputLocation" placeholder="Mekân / Stüdyo / Şehir" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Çekim Lokasyonu / Mekân</label>
+                            <input type="text" id="inputLocation" placeholder="Örn: Moda Sahili / Stüdyo A" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Çekim Konsepti / Proje Adı</label>
+                        <input type="text" id="inputConcept" placeholder="Örn: Sonbahar Portre Çekimi / Moda Kataloğu" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                    </div>
+                </div>
+
+                <!-- SECTION 2: MODEL / PARTICIPANT DETAILS -->
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="user" class="w-5 h-5 text-brand-500"></i>
+                            <h3 class="font-semibold text-slate-900 text-base">2. Model / Katılımcı Bilgileri</h3>
+                        </div>
+                        <!-- Under 18 Toggle -->
+                        <label class="flex items-center cursor-pointer space-x-2">
+                            <input type="checkbox" id="inputUnder18" onchange="toggleUnder18Mode()" class="w-4 h-4 text-brand-500 rounded border-slate-300 focus:ring-brand-500">
+                            <span class="text-xs font-medium text-slate-600">Model 18 yaşından küçük</span>
+                        </label>
+                    </div>
+
+                    <!-- Under 18 Notice Banner (Hidden by default) -->
+                    <div id="under18Notice" class="hidden bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800 space-y-1">
+                        <p class="font-semibold flex items-center gap-1">
+                            <i data-lucide="alert-circle" class="w-4 h-4 text-amber-600 inline"></i> 18 Yaş Altı Katılımcı Onayı
+                        </p>
+                        <p>Model 18 yaşından küçük olduğu için sözleşme ve T.C. Kimlik bilgileri yasal Velisi / Vasisi adına doldurulmalı ve imzalanmalıdır.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label id="lblFullName" class="block text-xs font-semibold text-slate-700 uppercase mb-1">Model Adı Soyadı</label>
+                            <input type="text" id="inputFullName" placeholder="Ad Soyad" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Konsept / Proje Tanımı</label>
-                            <input type="text" id="inputConcept" placeholder="Örn: Portre Çekimi, Moda Çekimi, Dış Mekan" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                            <label id="lblTcNo" class="block text-xs font-semibold text-slate-700 uppercase mb-1">T.C. Kimlik No</label>
+                            <input type="text" id="inputTcNo" maxlength="11" placeholder="11 Haneli T.C. No" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                        </div>
+                    </div>
+
+                    <div id="minorNameRow" class="hidden">
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">18 Yaş Altı Modelin Adı Soyadı</label>
+                        <input type="text" id="inputMinorName" placeholder="Küçük Katılımcı Adı Soyadı" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Telefon Numarası</label>
+                            <input type="tel" id="inputPhone" placeholder="05XX XXX XX XX" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">E-posta Adresi</label>
+                            <input type="email" id="inputEmail" placeholder="ornek@email.com" oninput="updateDocument()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
                         </div>
                     </div>
                 </div>
@@ -210,205 +233,249 @@
                     <label class="flex items-start space-x-3 p-3 bg-slate-50 rounded-lg border border-slate-200 cursor-pointer">
                         <input type="checkbox" id="inputKvkkCheck" onchange="updateDocument()" class="mt-0.5 w-4 h-4 text-brand-500 rounded border-slate-300 focus:ring-brand-500">
                         <span class="text-xs text-slate-700 leading-snug">
-                            6698 sayılı KVKK kapsamındaki Aydınlatma Metnini okudum. Görsel materyallerimin belirtilen mecralarda işlenmesine ve sosyal medya/portfolyo platformlarında yayınlanmasına <strong>açık rıza gösteriyorum.</strong>
+                            6698 sayılı KVKK kapsamındaki Aydınlatma Metnini okudum. Görsel materyallerimin belirtilen mecralarda işlenmesine ve Instagram vb. platformlarda yayınlanmasına <strong>açık rıza gösteriyorum.</strong>
                         </span>
                     </label>
 
-                    <!-- Modal Popup Driven Signature Cards -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                        <!-- Model / Guardian Signature Card Trigger -->
-                        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 hover:bg-slate-100/80 transition cursor-pointer group" onclick="openSignatureModal('model')">
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="text-xs font-semibold text-slate-700 uppercase cursor-pointer">Model / Veli İmzası</label>
-                                <span class="text-[11px] font-medium text-brand-600 bg-brand-50 px-2 py-0.5 rounded border border-brand-200 group-hover:bg-brand-500 group-hover:text-white transition">
-                                    <i data-lucide="edit-3" class="w-3 h-3 inline mr-1"></i>İmza At
-                                </span>
+                    <!-- Interactive Signature Pads (Model & Photographer) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Model / Guardian Canvas -->
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5 flex-wrap gap-1">
+                                <label class="block text-xs font-semibold text-slate-700 uppercase">
+                                    Model / Veli İmzası
+                                </label>
+                                <div class="flex items-center space-x-1">
+                                    <button type="button" id="modelPenBtn" onclick="setTool('model', 'pen')" class="px-2 py-1 text-[11px] font-medium rounded bg-brand-500 text-white flex items-center space-x-1 shadow-sm" title="Kalem Modu">
+                                        <i data-lucide="pen-tool" class="w-3 h-3"></i>
+                                        <span>Kalem</span>
+                                    </button>
+                                    <button type="button" id="modelEraserBtn" onclick="setTool('model', 'eraser')" class="px-2 py-1 text-[11px] font-medium rounded bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center space-x-1 transition" title="Lokal Silgi">
+                                        <i data-lucide="eraser" class="w-3 h-3"></i>
+                                        <span>Silgi</span>
+                                    </button>
+                                    <button type="button" onclick="clearSignature('model')" class="px-2 py-1 text-[11px] font-medium rounded bg-slate-100 hover:bg-rose-100 text-rose-600 flex items-center space-x-1 transition" title="Tümünü Temizle">
+                                        <i data-lucide="trash-2" class="w-3 h-3"></i>
+                                        <span>Tümünü Temizle</span>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="h-28 bg-white border border-slate-200 rounded-lg flex items-center justify-center p-2 relative overflow-hidden">
-                                <img id="formModelSigPreview" class="max-h-full object-contain hidden" alt="Model İmza Önizleme">
-                                <div id="formModelSigPlaceholder" class="text-slate-400 text-xs flex flex-col items-center space-y-1">
-                                    <i data-lucide="pen-tool" class="w-5 h-5 text-slate-300"></i>
-                                    <span>Tıklayarak imza ekranını açın</span>
+
+                            <div class="border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 relative overflow-hidden">
+                                <canvas id="signaturePad" class="signature-pad w-full h-32 bg-white"></canvas>
+                                <div id="signaturePlaceholder" class="absolute inset-0 pointer-events-none flex items-center justify-center text-slate-400 text-xs italic px-2 text-center">
+                                    Model / Veli İmzası...
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Photographer Signature Card Trigger -->
-                        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 hover:bg-slate-100/80 transition cursor-pointer group" onclick="openSignatureModal('photo')">
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="text-xs font-semibold text-slate-700 uppercase cursor-pointer">Fotoğrafçı İmzası</label>
-                                <span class="text-[11px] font-medium text-brand-600 bg-brand-50 px-2 py-0.5 rounded border border-brand-200 group-hover:bg-brand-500 group-hover:text-white transition">
-                                    <i data-lucide="edit-3" class="w-3 h-3 inline mr-1"></i>İmza At
-                                </span>
+                        <!-- Photographer Canvas -->
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5 flex-wrap gap-1">
+                                <label class="block text-xs font-semibold text-slate-700 uppercase">
+                                    Fotoğrafçı İmzası
+                                </label>
+                                <div class="flex items-center space-x-1">
+                                    <button type="button" id="photoPenBtn" onclick="setTool('photo', 'pen')" class="px-2 py-1 text-[11px] font-medium rounded bg-brand-500 text-white flex items-center space-x-1 shadow-sm" title="Kalem Modu">
+                                        <i data-lucide="pen-tool" class="w-3 h-3"></i>
+                                        <span>Kalem</span>
+                                    </button>
+                                    <button type="button" id="photoEraserBtn" onclick="setTool('photo', 'eraser')" class="px-2 py-1 text-[11px] font-medium rounded bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center space-x-1 transition" title="Lokal Silgi">
+                                        <i data-lucide="eraser" class="w-3 h-3"></i>
+                                        <span>Silgi</span>
+                                    </button>
+                                    <button type="button" onclick="clearSignature('photo')" class="px-2 py-1 text-[11px] font-medium rounded bg-slate-100 hover:bg-rose-100 text-rose-600 flex items-center space-x-1 transition" title="Tümünü Temizle">
+                                        <i data-lucide="trash-2" class="w-3 h-3"></i>
+                                        <span>Tümünü Temizle</span>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="h-28 bg-white border border-slate-200 rounded-lg flex items-center justify-center p-2 relative overflow-hidden">
-                                <img id="formPhotoSigPreview" class="max-h-full object-contain hidden" alt="Fotoğrafçı İmza Önizleme">
-                                <div id="formPhotoSigPlaceholder" class="text-slate-400 text-xs flex flex-col items-center space-y-1">
-                                    <i data-lucide="pen-tool" class="w-5 h-5 text-slate-300"></i>
-                                    <span>Tıklayarak imza ekranını açın</span>
+
+                            <div class="border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 relative overflow-hidden">
+                                <canvas id="photoSignaturePad" class="signature-pad w-full h-32 bg-white"></canvas>
+                                <div id="photoSignaturePlaceholder" class="absolute inset-0 pointer-events-none flex items-center justify-center text-slate-400 text-xs italic px-2 text-center">
+                                    M. Akif Demirbaş İmzası...
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Action Buttons Toolbar -->
-                <div class="flex flex-col sm:flex-row gap-3 pt-2">
-                    <button type="button" onclick="clearForm()" class="px-3 py-2.5 border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center justify-center space-x-2">
-                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-                        <span>Formu Sıfırla</span>
+                <!-- Action Button Container -->
+                <div class="pt-2 flex flex-col sm:flex-row gap-3">
+                    <button type="button" onclick="downloadPDF()" class="flex-1 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl shadow-md transition flex items-center justify-center space-x-2">
+                        <i data-lucide="file-down" class="w-5 h-5"></i>
+                        <span>PDF Belgesi Oluştur & İndir</span>
                     </button>
-                    <button type="button" onclick="sendViaWhatsApp()" class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl border border-slate-300 transition flex items-center justify-center space-x-1.5" title="Özet metin gönder">
-                        <i data-lucide="message-square" class="w-4 h-4 text-emerald-600"></i>
-                        <span>Metin Gönder</span>
+                    <button type="button" onclick="printDocument()" class="py-3 px-4 bg-slate-700 hover:bg-slate-800 text-white font-medium rounded-xl transition flex items-center justify-center space-x-2">
+                        <i data-lucide="printer" class="w-4 h-4"></i>
+                        <span>Yazdır</span>
                     </button>
-                    <button type="button" onclick="sendPdfViaWhatsApp()" class="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow transition flex items-center justify-center space-x-2">
-                        <i data-lucide="file-check" class="w-4 h-4"></i>
-                        <span>WhatsApp'a PDF Gönder</span>
+                    <button type="button" onclick="copyDocumentText()" class="py-3 px-4 bg-slate-200 hover:bg-slate-300 text-slate-800 font-medium rounded-xl transition flex items-center justify-center space-x-2">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                        <span>Kopyala</span>
                     </button>
                 </div>
             </form>
         </section>
 
-        <!-- RIGHT COLUMN: LIVE PRINTABLE CONTRACT PREVIEW -->
-        <section id="previewPanel" class="lg:col-span-7 flex flex-col space-y-4 hidden-mobile lg:block">
-            
-            <!-- Document Action Control Header -->
-            <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3 no-print">
-                <div class="flex items-center space-x-2 text-xs font-semibold text-slate-700">
-                    <i data-lucide="file-text" class="w-4 h-4 text-brand-500"></i>
-                    <span>Sözleşme Doküman Önizlemesi</span>
+        <!-- RIGHT PANEL: Live PDF / Print Document Preview -->
+        <section id="previewPanel" class="lg:col-span-6">
+            <div class="sticky top-20">
+                <div class="mb-2 flex items-center justify-between no-print">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center space-x-1">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                        <span>Canlı Belge Görünümü</span>
+                    </span>
+                    <span class="text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-medium">
+                        Senkronize
+                    </span>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <button onclick="copyDocumentText()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition flex items-center space-x-1.5">
-                        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                        <span>Metni Kopyala</span>
-                    </button>
-                    <button onclick="printDocument()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition flex items-center space-x-1.5">
-                        <i data-lucide="printer" class="w-3.5 h-3.5"></i>
-                        <span>Yazdır</span>
-                    </button>
-                    <button onclick="downloadPDF()" class="px-4 py-1.5 bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold rounded-lg shadow transition flex items-center space-x-1.5">
-                        <i data-lucide="download" class="w-3.5 h-3.5"></i>
-                        <span>PDF İndir</span>
-                    </button>
-                </div>
-            </div>
 
-            <!-- Printable Formal Document Wrapper -->
-            <div class="flex-1 overflow-y-auto custom-scrollbar max-h-[calc(100vh-10rem)] p-1">
-                <div id="printableDocument" class="bg-white p-8 sm:p-10 border border-slate-200 rounded-2xl shadow-md text-slate-800 text-xs sm:text-sm leading-relaxed space-y-6 max-w-3xl mx-auto">
-                    
-                    <!-- Document Header -->
-                    <div class="border-b-2 border-slate-900 pb-4 flex justify-between items-start">
-                        <div>
-                            <h2 class="font-bold text-slate-900 text-base sm:text-lg tracking-wide uppercase">Fotoğraf Çekim İzni ve KVKK Onam Formu</h2>
-                            <p class="text-[11px] text-slate-500 mt-0.5">5846 Sayılı FSEK ve 6698 Sayılı KVKK Uyarınca Düzenlenmiştir</p>
+                <!-- Legal Printable Sheet -->
+                <div id="printableDocument" class="document-container bg-white rounded-xl shadow-xl border border-slate-200 p-6 sm:p-10 text-slate-900 text-xs sm:text-sm space-y-6 leading-relaxed relative">
+
+                    <!-- Watermark Logo Accent -->
+                    <div class="absolute top-6 right-6 opacity-10 pointer-events-none no-print">
+                        <i data-lucide="camera" class="w-24 h-24 text-slate-900"></i>
+                    </div>
+
+                    <!-- Document Title Header -->
+                    <div class="border-b-2 border-slate-900 pb-4 text-center space-y-1">
+                        <h2 class="font-serif font-bold text-base sm:text-xl tracking-wider text-slate-900 uppercase">FOTOĞRAF ÇEKİM İZİN VE KVKK ONAM FORMU</h2>
+                        <p class="font-medium text-slate-700 text-xs sm:text-sm">M. Akif Demirbaş | Freelancer Fotoğrafçılık</p>
+                    </div>
+
+                    <!-- BÖLÜM 1 -->
+                    <div class="space-y-3">
+                        <h3 class="font-bold text-slate-900 uppercase tracking-wide border-l-2 border-brand-500 pl-2 text-xs sm:text-sm">
+                            BÖLÜM 1: Fotoğraf Çekim ve Telif Hakları İzin Sözleşmesi
+                        </h3>
+                        <p class="text-slate-700 text-justify leading-normal">
+                            İşbu sözleşme, bir tarafta bağımsız fotoğrafçı <strong>M. Akif Demirbaş</strong> (bundan sonra <em>"Fotoğrafçı"</em> olarak anılacaktır) ile diğer tarafta çekime konu olan model / katılımcı 
+                            <strong id="docModelNameDisplay" class="bg-amber-100 px-1 rounded">[Model Adı Soyadı]</strong> 
+                            (bundan sonra <em>"Model"</em> olarak anılacaktır) arasında, gerçekleştirilecek olan profesyonel fotoğraf çekimi ve bu süreçte elde edilecek görsel materyallerin kullanım şartlarını düzenlemek amacıyla tarafların karşılıklı irade beyanıyla akdedilmiştir.
+                        </p>
+
+                        <!-- Shoot Specs Box -->
+                        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-1 text-xs">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-1">
+                                <div><strong class="text-slate-900">Çekim Tarihi/Saat:</strong> <span id="docShootingDate" class="text-slate-700">-</span></div>
+                                <div><strong class="text-slate-900">Lokasyon / Mekân:</strong> <span id="docLocation" class="text-slate-700">-</span></div>
+                                <div><strong class="text-slate-900">Konsept / Proje:</strong> <span id="docConcept" class="text-slate-700">-</span></div>
+                            </div>
                         </div>
-                        <div class="text-right text-[11px] text-slate-500">
-                            <p class="font-bold text-slate-900">M. AKİF DEMİRBAŞ</p>
-                            <p>Freelancer Fotoğrafçılık</p>
+
+                        <!-- Articles -->
+                        <div class="space-y-2 text-slate-700">
+                            <p>
+                                <strong>Madde 1: Kapsam ve Materyal Tanımı</strong><br>
+                                Model, işbu sözleşme kapsamında gerçekleştirilecek olan fotoğraf çekimleri sırasında elde edilen her türlü fotoğraf, portre, dijital görüntü ve benzeri görsel materyallerin ("Materyaller") Fotoğrafçı tarafından işlenmesine, saklanmasına ve aşağıda belirtilen mecralarda kullanımına muvafakat eder.
+                            </p>
+                            <p>
+                                <strong>Madde 2: Kullanım Alanları ve Mecralar</strong><br>
+                                Fotoğrafçı, işbu sözleşme çerçevesinde üretilen materyalleri aşağıdaki alanlarda münhasıran veya genel tanıtım amaçlı kullanma hakkına sahiptir:
+                            </p>
+                            <ul class="list-disc pl-5 space-y-1 text-slate-600">
+                                <li><strong>Sanatsal ve Kültürel Faaliyetler:</strong> Ulusal veya uluslararası düzeyde düzenlenecek olan fotoğraf sergileri, bienaller, sanat galerisi gösterimleri ve kültürel projeler.</li>
+                                <li><strong>Dijital ve Sosyal Medya:</strong> Fotoğrafçıya ait resmi Instagram hesapları (@fotografikya ve kişisel profesyonel hesaplar) dahil olmak üzere tüm dijital platformlar, web siteleri, çevrim içi portfolyolar ve bloglar.</li>
+                                <li><strong>Basılı Yayınlar ve Tanıtım:</strong> Kataloglar, dergiler, sanat kitapları, basın bültenleri ve tanıtım broşürleri.</li>
+                            </ul>
+                            <p>
+                                <strong>Madde 3: Maddi Haklar, Telif ve Ücretlendirme</strong><br>
+                                Model, çekilen fotoğraflar üzerinde 5846 sayılı Fikir ve Sanat Eserleri Kanunu (FSEK) hükümleri gereğince herhangi bir telif ücreti, royalty, pay veya ek maddi menfaat talebinde bulunmayacağını, yapılan çekimin sanatsal ve mesleki iş birliği niteliği taşıdığını gayrikabili rücu kabul ve beyan eder.
+                            </p>
+                            <p>
+                                <strong>Madde 4: Mali Hakların Devri ve Lisans</strong><br>
+                                Model; umuma arz, yayma, işleme ve dijital iletim hakları dahil olmak üzere FSEK'ten doğan tüm mali hakların işbu sözleşme sınırları dahilinde, herhangi bir coğrafi ve süre sınırlamasına tabi olmaksızın Fotoğrafçı tarafından kullanılmasına izin vermiştir.
+                            </p>
                         </div>
                     </div>
 
-                    <!-- Intro Statement -->
-                    <p class="text-justify text-slate-700">
-                        İşbu Muvafakatname ve Açık Rıza Formu, aşağıda bilgileri yer alan Model / Katılımcı (<span id="docModelNameDisplay" class="font-bold text-slate-900">[Model Adı Soyadı]</span>) ile Fotoğrafçı <strong>M. Akif Demirbaş</strong> arasında gerçekleştirilen fotoğraf çekimleri neticesinde elde edilen görsel materyallerin kullanım şartlarını ve kişisel verilerin işlenmesine ilişkin hususları belirlemek amacıyla düzenlenmiştir.
-                    </p>
-
-                    <!-- Shoot Info Summary Box -->
-                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 grid grid-cols-2 gap-3 text-xs">
-                        <div>
-                            <span class="text-slate-500 block text-[10px] uppercase font-semibold">Tarih / Saat</span>
-                            <span id="docShootingDate" class="font-medium text-slate-900">-</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-500 block text-[10px] uppercase font-semibold">Lokasyon</span>
-                            <span id="docLocation" class="font-medium text-slate-900">-</span>
-                        </div>
-                        <div class="col-span-2">
-                            <span class="text-slate-500 block text-[10px] uppercase font-semibold">Konsept / Proje</span>
-                            <span id="docConcept" class="font-medium text-slate-900">-</span>
+                    <!-- BÖLÜM 2 -->
+                    <div class="space-y-3 pt-2 border-t border-slate-200">
+                        <h3 class="font-bold text-slate-900 uppercase tracking-wide border-l-2 border-brand-500 pl-2 text-xs sm:text-sm">
+                            BÖLÜM 2: 6698 Sayılı Kişisel Verilerin Korunması Kanunu (KVKK) Aydınlatma Metni
+                        </h3>
+                        <p class="text-slate-700 text-justify leading-normal">
+                            6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") ve ilgili ikincil mevzuat hükümleri gereğince, fotoğraf çekimi ve sonrasındaki sanatsal/tanıtım faaliyetleri sürecinde elde edilen kimlik ve görsel nitelikteki kişisel verilerinizin işlenme süreçleri hakkında bilgilendirme metnidir.
+                        </p>
+                        
+                        <div class="space-y-2 text-slate-700">
+                            <p>
+                                <strong>1. Veri Sorumlusunun Kimliği ve İletişim:</strong> Fotoğraf çekim faaliyetini yürüten ve kişisel verilerinizi veri sorumlusu sıfatıyla işleyen taraf, bağımsız fotoğrafçı M. Akif Demirbaş'tır.
+                            </p>
+                            <p>
+                                <strong>2. Kişisel Verilerin İşlenme Amaçları, Gizliliği ve Güvenliği:</strong> Toplanan kişisel verileriniz (ad-soyad, iletişim bilgileri, fotoğraf kayıtları); fotoğraf çekimi organizasyonlarının planlanması, elde edilen sanatsal görsellerin arşivlenmesi, portfolyo yönetimi, Instagram hesaplarında ve sanatsal sergilerde kamuoyuna sunulması amaçlarıyla KVKK'nın 5. maddesi gereğince işlenmektedir. Formda yer alan T.C. Kimlik Numarası bilgisi yalnızca hukuki geçerliliğin sağlanması, tarafların tespiti ve arşivleme amacıyla fotoğrafçı (M. Akif Demirbaş) nezdinde saklı tutulacak olup, hiçbir surette üçüncü kişi, kurum ya da kuruluşlarla paylaşılmayacaktır.
+                            </p>
+                            <p class="bg-emerald-50 p-2.5 rounded border border-emerald-200 text-emerald-900 font-medium">
+                                <strong>3. Açık Rıza Beyanı:</strong> İşbu aydınlatma metnini okuduğumu, anladığımı ve 6698 sayılı KVKK kapsamında kişisel verilerimin yukarıda belirtilen amaçlarla işlenmesine, arşivlenmesine, Instagram platformunda ve sanatsal sergilerde yayınlanmasına yönelik açık rızamı, T.C. Kimlik Numaramın gizli tutulacağı ve üçüncü taraflarla paylaşılmayacağı güvencesiyle hiçbir baskı altında kalmaksızın, tamamen özgür irademle verdiğimi kabul, beyan ve taahhüt ederim.
+                            </p>
                         </div>
                     </div>
 
-                    <!-- Legal Contract Articles -->
-                    <div class="space-y-3 text-slate-700">
-                        <p>
-                            <strong>Madde 1: Kapsam ve Materyal Tanımı</strong><br>
-                            Model, işbu sözleşme kapsamında gerçekleştirilecek olan fotoğraf çekimleri sırasında elde edilen her türlü fotoğraf, portre, dijital görüntü ve benzeri görsel materyallerin ("Materyaller") Fotoğrafçı tarafından işlenmesine, saklanmasına ve aşağıda belirtilen mecralarda kullanımına muvafakat eder.
+                    <!-- BÖLÜM 3 -->
+                    <div class="space-y-4 pt-2 border-t border-slate-200">
+                        <h3 class="font-bold text-slate-900 uppercase tracking-wide border-l-2 border-brand-500 pl-2 text-xs sm:text-sm">
+                            BÖLÜM 3: Son Hükümler ve İmzalar
+                        </h3>
+                        <p class="text-slate-700">
+                            İşbu form, tarafların haklarını güvence altına alan maddeleri içeren bu metnin okunması ve onaylanmasıyla karşılıklı olarak yürürlüğe girer.
                         </p>
-                        <p>
-                            <strong>Madde 2: Kullanım Alanları ve Mecralar</strong><br>
-                            Fotoğrafçı, işbu sözleşme çerçevesinde üretilen materyalleri aşağıdaki alanlarda münhasıran veya genel tanıtım amaçlı kullanma hakkına sahiptir:
-                        </p>
-                        <ul class="list-disc pl-5 space-y-1 text-slate-600">
-                            <li><strong>Sanatsal ve Kültürel Faaliyetler:</strong> Ulusal veya uluslararası fotoğraf sergileri, bienaller, sanat galerisi gösterimleri ve kültürel yayınlar.</li>
-                            <li><strong>Dijital ve Sosyal Medya:</strong> Fotoğrafçıya ait resmi web siteleri, sosyal medya hesapları (Instagram, Behance vb.), çevrim içi portfolyolar ve bloglar.</li>
-                            <li><strong>Basılı Yayınlar ve Tanıtım:</strong> Kataloglar, dergiler, sanat kitapları, basın bültenleri ve tanıtım broşürleri.</li>
-                        </ul>
-                        <p>
-                            <strong>Madde 3: Maddi Haklar, Telif ve Ücretlendirme</strong><br>
-                            Model, çekilen fotoğraflar üzerinde 5846 sayılı Fikir ve Sanat Eserleri Kanunu (FSEK) hükümleri gereğince herhangi bir telif ücreti, royalty, pay veya ek maddi menfaat talebinde bulunmayacağını, yapılan çekimin sanatsal ve mesleki iş birliği niteliği taşıdığını gayrikabili rücu kabul ve beyan eder.
-                        </p>
-                        <p>
-                            <strong>Madde 4: 6698 Sayılı KVKK Kapsamında Açık Rıza</strong><br>
-                            Model / Veli, kişisel veri niteliğindeki görsel ve işitsel kayıtlarının 6698 sayılı Kişisel Verilerin Korunması Kanunu'na (KVKK) uygun olarak işlenmesine, arşivlenmesine ve yukarıda sayılan mecralarda umuma arz edilmesine <strong>açık rıza gösterdiğini</strong> kabul eder. T.C. Kimlik No ve iletişim bilgileri strictly gizli tutulacak, 3. şahıslarla paylaşılmayacaktır.
-                        </p>
-                        <p>
-                            <strong>Madde 5: Yürürlük ve İptal Koşulları</strong><br>
-                            İşbu onay belgesi süresiz olarak geçerlidir. Model, KVKK'nın 11. maddesi kapsamındaki haklarını saklı tutar.
-                        </p>
-                    </div>
 
-                    <!-- Explicit Handwritten Statement Box -->
-                    <div class="border-l-4 border-brand-500 bg-brand-50/50 p-3 rounded-r-lg">
-                        <p class="text-[11px] text-slate-500 uppercase font-semibold mb-1">Model / Veli Onay Beyanı:</p>
-                        <p id="docConsentText" class="font-medium text-slate-800 italic">"Okudum, anladım, kabul ediyorum."</p>
-                    </div>
+                        <!-- Signatures Grid -->
+                        <div class="grid grid-cols-2 gap-6 pt-2">
+                            <!-- Model / Guardian Column -->
+                            <div class="border border-slate-200 rounded-lg p-3 space-y-2 bg-slate-50/50">
+                                <h4 class="font-bold text-slate-900 underline text-xs uppercase" id="docSignerHeader">Model / Katılımcı</h4>
+                                <div class="space-y-1 text-xs text-slate-700">
+                                    <p><strong>Adı Soyadı:</strong> <span id="docFullName">-</span></p>
+                                    <p id="docMinorNameBox" class="hidden text-amber-800"><strong>Küçük Katılımcı:</strong> <span id="docMinorName">-</span></p>
+                                    <p><strong>T.C. Kimlik No:</strong> <span id="docTcNo">-</span></p>
+                                    <p class="text-[10px] text-slate-500 italic">T.C. Kimlik No resmi geçerlilik için alınmakta olup üçüncü şahıslarla paylaşılmaz.</p>
+                                    <p><strong>Tel / E-posta:</strong> <span id="docContact">-</span></p>
+                                    <p><strong>Tarih:</strong> <span id="docSignDate">-</span></p>
+                                    <p><strong>Onay Metni:</strong> <span id="docConsentText" class="italic text-brand-600 font-semibold">"Okudum, anladım, kabul ediyorum."</span></p>
+                                </div>
 
-                    <!-- Signatures Section -->
-                    <div class="pt-6 border-t border-slate-200 grid grid-cols-2 gap-6">
-                        <!-- Model / Guardian Column -->
-                        <div class="border border-slate-200 rounded-lg p-3 space-y-2 bg-slate-50/50">
-                            <h4 id="docSignerHeader" class="font-bold text-slate-900 underline text-xs uppercase">Model / Katılımcı</h4>
-                            <div class="space-y-1 text-xs text-slate-700">
-                                <p><strong>Adı Soyadı:</strong> <span id="docFullName">-</span></p>
-                                <p id="docMinorNameBox" class="hidden"><strong>Reşit Olmayan Model:</strong> <span id="docMinorName">-</span></p>
-                                <p><strong>T.C. Kimlik No:</strong> <span id="docTcNo">-</span></p>
-                                <p><strong>İletişim:</strong> <span id="docContact">-</span></p>
-                                <p><strong>Tarih:</strong> <span id="docSignDate">-</span></p>
+                                <!-- Signature Image output -->
+                                <div class="pt-2 border-t border-slate-200">
+                                    <p class="text-[10px] font-semibold uppercase text-slate-500">Dijital İmza:</p>
+                                    <div class="h-16 flex items-center justify-center bg-white rounded border border-slate-200 mt-1">
+                                        <img id="docSignatureImg" class="max-h-full object-contain hidden" alt="Model İmza">
+                                        <span id="docSignatureNull" class="text-[10px] text-slate-400 italic">Henüz imzalanmadı</span>
+                                    </div>
+                                </div>
                             </div>
 
-                            <!-- Model Signature Display -->
-                            <div class="pt-2">
-                                <p class="text-[10px] text-slate-400 uppercase font-semibold mb-1">İmza:</p>
-                                <div class="h-20 bg-white border border-slate-200 rounded flex items-center justify-center p-1 relative overflow-hidden">
-                                    <img id="docSignatureImg" class="max-h-full object-contain hidden" alt="Model İmzası">
-                                    <span id="docSignatureNull" class="text-slate-300 italic text-[11px]">Dijital İmza Yok</span>
+                            <!-- Photographer Column -->
+                            <div class="border border-slate-200 rounded-lg p-3 space-y-2 bg-slate-50/50">
+                                <h4 class="font-bold text-slate-900 underline text-xs uppercase">Fotoğrafçı</h4>
+                                <div class="space-y-1 text-xs text-slate-700">
+                                    <p><strong>Adı Soyadı:</strong> M. Akif Demirbaş</p>
+                                    <p><strong>Faaliyet Alanı:</strong> Freelancer Fotoğrafçılık</p>
+                                    <p><strong>Instagram:</strong> @fotografikya</p>
+                                    <p><strong>Tarih:</strong> <span id="docPhotographerDate">-</span></p>
+                                </div>
+
+                                <!-- Photographer Signature Display -->
+                                <div class="pt-2 border-t border-slate-200">
+                                    <p class="text-[10px] font-semibold uppercase text-slate-500">Fotoğrafçı Onayı / İmza:</p>
+                                    <div class="h-16 flex items-center justify-center bg-white rounded border border-slate-200 mt-1">
+                                        <img id="docPhotoSignatureImg" class="max-h-full object-contain hidden" alt="Fotoğrafçı İmza">
+                                        <div id="docPhotoSignatureDefault" class="flex flex-col items-center justify-center text-center p-1">
+                                            <span class="font-serif italic text-brand-700 font-bold text-sm">M. Akif Demirbaş</span>
+                                            <span class="text-[9px] text-slate-400 uppercase tracking-widest">Dijital Onaylı Belge</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Photographer Column -->
-                        <div class="border border-slate-200 rounded-lg p-3 space-y-2 bg-slate-50/50">
-                            <h4 class="font-bold text-slate-900 underline text-xs uppercase">Fotoğrafçı</h4>
-                            <div class="space-y-1 text-xs text-slate-700">
-                                <p><strong>Adı Soyadı:</strong> M. Akif Demirbaş</p>
-                                <p><strong>Faaliyet Alanı:</strong> Freelancer Fotoğrafçılık</p>
-                                <p><strong>İletişim:</strong> M. Akif Demirbaş Portfolyo</p>
-                                <p><strong>Tarih:</strong> <span id="docPhotographerDate">-</span></p>
-                            </div>
-
-                            <!-- Photographer Signature Display -->
-                            <div class="pt-2">
-                                <p class="text-[10px] text-slate-400 uppercase font-semibold mb-1">İmza:</p>
-                                <div class="h-20 bg-white border border-slate-200 rounded flex items-center justify-center p-1 relative overflow-hidden">
-                                    <img id="docPhotoSignatureImg" class="max-h-full object-contain hidden" alt="Fotoğrafçı İmzası">
-                                    <span id="docPhotoSignatureDefault" class="text-slate-400 font-serif italic text-sm font-bold">M. Akif Demirbaş</span>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Under 18 Footer Note -->
+                        <p class="text-[10px] text-slate-500 border-t border-slate-100 pt-2 italic">
+                            * Önemli Not: Modelin 18 yaşından küçük olması durumunda, işbu formun "Model/Katılımcı" alanı yasal velisi veya vasisi tarafından imzalanmalı ve kimlik bilgileri veli adına doldurulmalıdır.
+                        </p>
                     </div>
 
                 </div>
@@ -417,221 +484,175 @@
 
     </main>
 
-    <!-- SIGNATURE POPUP MODAL -->
-    <div id="signatureModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-6 no-print">
-        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[95vh] border border-slate-200">
-            <!-- Modal Header -->
-            <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <div class="p-1.5 bg-brand-500 rounded-lg text-white">
-                        <i data-lucide="pen-tool" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h3 id="modalTitle" class="font-bold text-sm sm:text-base leading-tight">Dijital İmza Penceresi</h3>
-                        <p class="text-[11px] text-slate-400">Lütfen imzanızı ekrana atıp onaylayınız</p>
-                    </div>
-                </div>
-                <button type="button" onclick="closeSignatureModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </div>
-
-            <!-- Modal Body & Control Bar -->
-            <div class="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
-                <!-- Tool and Mode Toolbar -->
-                <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-100 p-3 rounded-xl border border-slate-200">
-                    
-                    <!-- Drawing Tool Toggle (Kalem / Silgi) -->
-                    <div class="flex items-center space-x-1 bg-white p-1 rounded-lg border border-slate-200 shadow-sm">
-                        <button type="button" id="modalPenBtn" onclick="setModalTool('pen')" class="px-3 py-1.5 text-xs font-semibold rounded-md bg-brand-500 text-white flex items-center space-x-1.5 transition">
-                            <i data-lucide="pen-tool" class="w-3.5 h-3.5"></i>
-                            <span>Kalem</span>
-                        </button>
-                        <button type="button" id="modalEraserBtn" onclick="setModalTool('eraser')" class="px-3 py-1.5 text-xs font-semibold rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center space-x-1.5 transition">
-                            <i data-lucide="eraser" class="w-3.5 h-3.5"></i>
-                            <span>Silgi</span>
-                        </button>
-                    </div>
-
-                    <!-- Input Mode Switch (Touch/All vs Stylus Palm Rejection) -->
-                    <div class="flex items-center space-x-1 bg-white p-1 rounded-lg border border-slate-200 shadow-sm">
-                        <span class="text-[11px] font-semibold text-slate-500 px-2 hidden sm:inline">Girdi Modu:</span>
-                        <button type="button" id="inputModeAllBtn" onclick="setModalInputMode('all')" class="px-2.5 py-1.5 text-xs font-medium rounded-md bg-brand-500 text-white flex items-center space-x-1 shadow-sm transition" title="Hem el/parmak hem tablet kalemi ile çizim yapılabilir">
-                            <i data-lucide="hand" class="w-3.5 h-3.5"></i>
-                            <span>El + Kalem</span>
-                        </button>
-                        <button type="button" id="inputModePenBtn" onclick="setModalInputMode('pen')" class="px-2.5 py-1.5 text-xs font-medium rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center space-x-1 transition" title="Avuç içi dokunmasını engeller, sadece Stylus / Kalemi algılar">
-                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-                            <span>Sadece Kalem (Avuç Engelleme)</span>
-                        </button>
-                    </div>
-
-                    <!-- Clear Canvas Button -->
-                    <button type="button" onclick="clearModalCanvas()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 flex items-center space-x-1 transition">
-                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                        <span>Temizle</span>
-                    </button>
-                </div>
-
-                <!-- Input mode info notice -->
-                <div id="modalInputNotice" class="text-[11px] text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 flex items-center space-x-1.5">
-                    <i data-lucide="info" class="w-3.5 h-3.5 text-brand-500 flex-shrink-0"></i>
-                    <span id="modalInputNoticeText">Her türlü dokunma ve kalem girdisi kabul ediliyor.</span>
-                </div>
-
-                <!-- Modal Signature Drawing Canvas Frame -->
-                <div class="border-2 border-dashed border-slate-300 rounded-2xl bg-white relative overflow-hidden shadow-inner h-64 sm:h-80 touch-none">
-                    <canvas id="modalSignatureCanvas" class="w-full h-full cursor-crosshair block"></canvas>
-                    <div id="modalCanvasPlaceholder" class="absolute inset-0 pointer-events-none flex items-center justify-center text-slate-300 text-sm italic font-serif">
-                        İmzanızı buraya atınız...
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal Footer -->
-            <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end space-x-3">
-                <button type="button" onclick="closeSignatureModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-xl transition">
-                    İptal
-                </button>
-                <button type="button" onclick="saveModalSignature()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow transition flex items-center space-x-1.5">
-                    <i data-lucide="check-circle" class="w-4 h-4"></i>
-                    <span>İmzayı Kaydet & Onayla</span>
-                </button>
-            </div>
+    <!-- Custom Toast Message Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 border border-slate-700">
+            <i id="toastIcon" data-lucide="info" class="w-5 h-5 text-emerald-400"></i>
+            <span id="toastMessage" class="text-xs sm:text-sm font-medium">İşlem tamamlandı.</span>
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION CONTAINER -->
-    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+    <!-- Application Footer -->
+    <footer class="no-print bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-1">
+            <p>&copy; 2026 M. Akif Demirbaş - Freelancer Fotoğrafçılık. Tüm Hakları Saklıdır.</p>
+            <p class="text-slate-500">6698 sayılı KVKK ve 5846 sayılı FSEK Uyumlu Dijital Sözleşme Portalı</p>
+        </div>
+    </footer>
 
-    <!-- APPLICATION LOGIC & JAVASCRIPT -->
     <script>
-        // Modal & Application State Variables
-        let currentSigTarget = null; // 'model' or 'photo'
-        let modalTool = 'pen';       // 'pen' or 'eraser'
-        let modalInputMode = 'all';  // 'all' (touch + stylus) or 'pen' (stylus only, palm rejection)
-        let modalCanvas = null;
-        let modalCtx = null;
-        let isModalDrawing = false;
-
-        // Signatures data storage (Base64 PNGs)
-        const signatureData = {
-            model: null,
-            photo: null
-        };
+        // DOM Elements
+        const form = document.getElementById('interactiveForm');
+        let modelCanvasObj = null;
+        let photoCanvasObj = null;
 
         // Initialize Lucide Icons
         lucide.createIcons();
 
-        // Setup Popup Modal Signature Canvas with Pointer Events and Palm Rejection Support
-        function initModalCanvas() {
-            modalCanvas = document.getElementById('modalSignatureCanvas');
-            modalCtx = modalCanvas.getContext('2d', { willReadFrequently: true });
+        // Canvas Setup Helper supporting mouse, touch, dot clicks, pen and eraser mode
+        function setupCanvas(canvasId, placeholderId, imgPreviewId, nullPreviewId, padType) {
+            const canvas = document.getElementById(canvasId);
+            const placeholder = document.getElementById(placeholderId);
+            const previewImg = document.getElementById(imgPreviewId);
+            const nullPreview = document.getElementById(nullPreviewId);
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            
+            let isDrawing = false;
+            let currentTool = 'pen'; // 'pen' or 'eraser'
 
-            function resizeModalCanvas() {
+            function resize() {
+                // Save canvas content
                 const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = modalCanvas.width;
-                tempCanvas.height = modalCanvas.height;
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = canvas.height;
                 const tempCtx = tempCanvas.getContext('2d');
-                if (modalCanvas.width > 0 && modalCanvas.height > 0) {
-                    tempCtx.drawImage(modalCanvas, 0, 0);
+                if (canvas.width > 0 && canvas.height > 0) {
+                    tempCtx.drawImage(canvas, 0, 0);
                 }
 
-                const rect = modalCanvas.getBoundingClientRect();
+                const rect = canvas.getBoundingClientRect();
                 const ratio = window.devicePixelRatio || 1;
-                modalCanvas.width = rect.width * ratio;
-                modalCanvas.height = rect.height * ratio;
-
-                modalCtx.scale(ratio, ratio);
-                modalCtx.lineCap = 'round';
-                modalCtx.lineJoin = 'round';
+                canvas.width = rect.width * ratio;
+                canvas.height = rect.height * ratio;
+                
+                ctx.scale(ratio, ratio);
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
 
                 if (tempCanvas.width > 0 && tempCanvas.height > 0) {
-                    modalCtx.drawImage(tempCanvas, 0, 0, tempCanvas.width, tempCanvas.height, 0, 0, rect.width, rect.height);
+                    ctx.drawImage(tempCanvas, 0, 0, tempCanvas.width, tempCanvas.height, 0, 0, rect.width, rect.height);
+                }
+            }
+
+            // Check if canvas has non-transparent pixels
+            function checkBlank() {
+                const pixelData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                for (let i = 3; i < pixelData.length; i += 4) {
+                    if (pixelData[i] > 10) return false;
+                }
+                return true;
+            }
+
+            function updatePreview() {
+                const isBlank = checkBlank();
+                if (!isBlank) {
+                    previewImg.src = canvas.toDataURL();
+                    previewImg.classList.remove('hidden');
+                    if (nullPreview) nullPreview.classList.add('hidden');
+                    placeholder.classList.add('hidden');
+                } else {
+                    previewImg.classList.add('hidden');
+                    if (nullPreview) nullPreview.classList.remove('hidden');
+                    placeholder.classList.remove('hidden');
                 }
             }
 
             function setStrokeStyle() {
-                modalCtx.lineCap = 'round';
-                modalCtx.lineJoin = 'round';
-                if (modalTool === 'pen') {
-                    modalCtx.globalCompositeOperation = 'source-over';
-                    modalCtx.strokeStyle = '#0f172a';
-                    modalCtx.fillStyle = '#0f172a';
-                    modalCtx.lineWidth = 2.8;
+                if (currentTool === 'pen') {
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.strokeStyle = '#1e293b';
+                    ctx.lineWidth = 2.5;
                 } else {
-                    modalCtx.globalCompositeOperation = 'destination-out';
-                    modalCtx.lineWidth = 20;
+                    ctx.globalCompositeOperation = 'destination-out';
+                    ctx.lineWidth = 18;
                 }
             }
 
             function getPos(e) {
-                const rect = modalCanvas.getBoundingClientRect();
-                return {
-                    x: e.clientX - rect.left,
-                    y: e.clientY - rect.top
-                };
+                const rect = canvas.getBoundingClientRect();
+                if (e.touches && e.touches.length > 0) {
+                    return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+                }
+                return { x: e.clientX - rect.left, y: e.clientY - rect.top };
             }
 
-            // Pointer Events Handle Mouse, Touch, and Stylus (Pen) natively
-            function handlePointerDown(e) {
-                // PALM REJECTION: If 'pen' mode is selected, ignore touch/finger events
-                if (modalInputMode === 'pen' && e.pointerType === 'touch') {
-                    showToast('Avuç içi engelleme aktif! Sadece tablet kalemi algılanır.', 'warning');
-                    return;
-                }
-
-                isModalDrawing = true;
-                modalCanvas.setPointerCapture(e.pointerId);
+            function startDrawing(e) {
+                isDrawing = true;
                 setStrokeStyle();
                 const pos = getPos(e);
-                
-                modalCtx.beginPath();
-                if (modalTool === 'pen') {
-                    // Tek dokunuşta net nokta koyulabilmesi için daire çizimi yapıyoruz
-                    modalCtx.arc(pos.x, pos.y, modalCtx.lineWidth / 2, 0, Math.PI * 2);
-                    modalCtx.fill();
-                    modalCtx.beginPath();
-                }
-                modalCtx.moveTo(pos.x, pos.y);
-                modalCtx.lineTo(pos.x, pos.y);
-                modalCtx.stroke();
-                checkModalCanvasState();
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+                updatePreview();
             }
 
-            function handlePointerMove(e) {
-                if (!isModalDrawing) return;
-                if (modalInputMode === 'pen' && e.pointerType === 'touch') return;
-
+            function draw(e) {
+                if (!isDrawing) return;
                 e.preventDefault();
                 setStrokeStyle();
                 const pos = getPos(e);
-                modalCtx.lineTo(pos.x, pos.y);
-                modalCtx.stroke();
-                checkModalCanvasState();
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+                updatePreview();
             }
 
-            function handlePointerUp(e) {
-                if (isModalDrawing) {
-                    isModalDrawing = false;
-                    try { modalCanvas.releasePointerCapture(e.pointerId); } catch(err) {}
-                    modalCtx.closePath();
-                    checkModalCanvasState();
+            function stopDrawing() {
+                if (isDrawing) {
+                    isDrawing = false;
+                    ctx.closePath();
+                    updatePreview();
                 }
             }
 
-            modalCanvas.addEventListener('pointerdown', handlePointerDown);
-            modalCanvas.addEventListener('pointermove', handlePointerMove);
-            modalCanvas.addEventListener('pointerup', handlePointerUp);
-            modalCanvas.addEventListener('pointercancel', handlePointerUp);
+            function clear() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                updatePreview();
+            }
 
-            return { resize: resizeModalCanvas };
+            function setTool(tool) {
+                currentTool = tool;
+                canvas.style.cursor = tool === 'eraser' ? 'cell' : 'crosshair';
+                
+                const penBtn = document.getElementById(`${padType}PenBtn`);
+                const eraserBtn = document.getElementById(`${padType}EraserBtn`);
+                
+                if (tool === 'pen') {
+                    penBtn.className = "px-2 py-1 text-[11px] font-medium rounded bg-brand-500 text-white flex items-center space-x-1 shadow-sm";
+                    eraserBtn.className = "px-2 py-1 text-[11px] font-medium rounded bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center space-x-1 transition";
+                } else {
+                    penBtn.className = "px-2 py-1 text-[11px] font-medium rounded bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center space-x-1 transition";
+                    eraserBtn.className = "px-2 py-1 text-[11px] font-medium rounded bg-amber-500 text-white flex items-center space-x-1 shadow-sm";
+                }
+            }
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            window.addEventListener('mouseup', stopDrawing);
+
+            canvas.addEventListener('touchstart', startDrawing, { passive: false });
+            canvas.addEventListener('touchmove', draw, { passive: false });
+            window.addEventListener('touchend', stopDrawing);
+
+            return { canvas, resize, clear, setTool };
         }
 
-        let modalCanvasHandler = null;
-
         window.addEventListener('load', () => {
-            modalCanvasHandler = initModalCanvas();
+            modelCanvasObj = setupCanvas('signaturePad', 'signaturePlaceholder', 'docSignatureImg', 'docSignatureNull', 'model');
+            photoCanvasObj = setupCanvas('photoSignaturePad', 'photoSignaturePlaceholder', 'docPhotoSignatureImg', 'docPhotoSignatureDefault', 'photo');
+            
+            modelCanvasObj.resize();
+            photoCanvasObj.resize();
 
             // Set current date on initial load
             const now = new Date();
@@ -640,159 +661,31 @@
             updateDocument();
         });
 
-        // Open Signature Modal
-        function openSignatureModal(target) {
-            currentSigTarget = target;
-            const modal = document.getElementById('signatureModal');
-            const modalTitle = document.getElementById('modalTitle');
-            
-            if (target === 'model') {
-                const isUnder18 = document.getElementById('inputUnder18').checked;
-                modalTitle.innerText = isUnder18 ? "Veli / Vasi İmzası" : "Model / Katılımcı İmzası";
-            } else {
-                modalTitle.innerText = "Fotoğrafçı İmzası (M. Akif Demirbaş)";
-            }
+        window.addEventListener('resize', () => {
+            if (modelCanvasObj) modelCanvasObj.resize();
+            if (photoCanvasObj) photoCanvasObj.resize();
+        });
 
-            modal.classList.remove('hidden');
-
-            // Resize canvas to match popup bounds
-            setTimeout(() => {
-                if (modalCanvasHandler) modalCanvasHandler.resize();
-                clearModalCanvas();
-                if (signatureData[target]) {
-                    const img = new Image();
-                    img.onload = () => {
-                        modalCtx.drawImage(img, 0, 0, modalCanvas.width / (window.devicePixelRatio || 1), modalCanvas.height / (window.devicePixelRatio || 1));
-                        checkModalCanvasState();
-                    };
-                    img.src = signatureData[target];
-                }
-            }, 50);
-        }
-
-        // Close Signature Modal
-        function closeSignatureModal() {
-            document.getElementById('signatureModal').classList.add('hidden');
-            currentSigTarget = null;
-        }
-
-        // Set Modal Tool (Pen / Eraser)
-        function setModalTool(tool) {
-            modalTool = tool;
-            const penBtn = document.getElementById('modalPenBtn');
-            const eraserBtn = document.getElementById('modalEraserBtn');
-
-            if (tool === 'pen') {
-                penBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-md bg-brand-500 text-white flex items-center space-x-1.5 transition";
-                eraserBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center space-x-1.5 transition";
-            } else {
-                penBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center space-x-1.5 transition";
-                eraserBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-md bg-amber-500 text-white flex items-center space-x-1.5 transition";
+        // Switch active drawing tool (Pen / Eraser)
+        function setTool(type, tool) {
+            if (type === 'model' && modelCanvasObj) {
+                modelCanvasObj.setTool(tool);
+                showToast(`Model imzası için ${tool === 'pen' ? 'Kalem' : 'Silgi'} seçildi.`, 'info');
+            } else if (type === 'photo' && photoCanvasObj) {
+                photoCanvasObj.setTool(tool);
+                showToast(`Fotoğrafçı imzası için ${tool === 'pen' ? 'Kalem' : 'Silgi'} seçildi.`, 'info');
             }
         }
 
-        // Set Input Mode (Touch+Pen vs Stylus Palm Rejection)
-        function setModalInputMode(mode) {
-            modalInputMode = mode;
-            const allBtn = document.getElementById('inputModeAllBtn');
-            const penBtn = document.getElementById('inputModePenBtn');
-            const noticeText = document.getElementById('modalInputNoticeText');
-
-            if (mode === 'all') {
-                allBtn.className = "px-2.5 py-1.5 text-xs font-medium rounded-md bg-brand-500 text-white flex items-center space-x-1 shadow-sm transition";
-                penBtn.className = "px-2.5 py-1.5 text-xs font-medium rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center space-x-1 transition";
-                noticeText.innerText = "Her türlü dokunma ve kalem girdisi kabul ediliyor.";
-                showToast('Girdi modu: Serbest (El + Kalem) seçildi.', 'info');
-            } else {
-                allBtn.className = "px-2.5 py-1.5 text-xs font-medium rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center space-x-1 transition";
-                penBtn.className = "px-2.5 py-1.5 text-xs font-medium rounded-md bg-brand-500 text-white flex items-center space-x-1 shadow-sm transition";
-                noticeText.innerText = "Avuç içi engelleme aktif! Sadece tablet kalemi (Stylus) ile çizim yapılabilir.";
-                showToast('Girdi modu: Sadece Tablet Kalemi (Avuç Engelleme) seçildi.', 'info');
+        // Clear signature helper
+        function clearSignature(type) {
+            if (type === 'model' && modelCanvasObj) {
+                modelCanvasObj.clear();
+                showToast('Model imza alanı tamamen temizlendi.', 'info');
+            } else if (type === 'photo' && photoCanvasObj) {
+                photoCanvasObj.clear();
+                showToast('Fotoğrafçı imza alanı tamamen temizlendi.', 'info');
             }
-        }
-
-        // Clear Modal Canvas
-        function clearModalCanvas() {
-            modalCtx.clearRect(0, 0, modalCanvas.width, modalCanvas.height);
-            checkModalCanvasState();
-        }
-
-        // Check if canvas is blank and toggle placeholder
-        function isModalCanvasBlank() {
-            const pixelData = modalCtx.getImageData(0, 0, modalCanvas.width, modalCanvas.height).data;
-            for (let i = 3; i < pixelData.length; i += 4) {
-                if (pixelData[i] > 10) return false;
-            }
-            return true;
-        }
-
-        function checkModalCanvasState() {
-            const placeholder = document.getElementById('modalCanvasPlaceholder');
-            if (isModalCanvasBlank()) {
-                placeholder.classList.remove('hidden');
-            } else {
-                placeholder.classList.add('hidden');
-            }
-        }
-
-        // Save Modal Signature to Form Preview and Live Document
-        function saveModalSignature() {
-            if (!currentSigTarget) return;
-
-            const isBlank = isModalCanvasBlank();
-            if (isBlank) {
-                signatureData[currentSigTarget] = null;
-            } else {
-                signatureData[currentSigTarget] = modalCanvas.toDataURL();
-            }
-
-            // Update UI preview elements
-            if (currentSigTarget === 'model') {
-                const formPreview = document.getElementById('formModelSigPreview');
-                const formPlaceholder = document.getElementById('formModelSigPlaceholder');
-                const docImg = document.getElementById('docSignatureImg');
-                const docNull = document.getElementById('docSignatureNull');
-
-                if (signatureData.model) {
-                    formPreview.src = signatureData.model;
-                    formPreview.classList.remove('hidden');
-                    formPlaceholder.classList.add('hidden');
-
-                    docImg.src = signatureData.model;
-                    docImg.classList.remove('hidden');
-                    if (docNull) docNull.classList.add('hidden');
-                } else {
-                    formPreview.classList.add('hidden');
-                    formPlaceholder.classList.remove('hidden');
-
-                    docImg.classList.add('hidden');
-                    if (docNull) docNull.classList.remove('hidden');
-                }
-            } else if (currentSigTarget === 'photo') {
-                const formPreview = document.getElementById('formPhotoSigPreview');
-                const formPlaceholder = document.getElementById('formPhotoSigPlaceholder');
-                const docImg = document.getElementById('docPhotoSignatureImg');
-                const docDefault = document.getElementById('docPhotoSignatureDefault');
-
-                if (signatureData.photo) {
-                    formPreview.src = signatureData.photo;
-                    formPreview.classList.remove('hidden');
-                    formPlaceholder.classList.add('hidden');
-
-                    docImg.src = signatureData.photo;
-                    docImg.classList.remove('hidden');
-                    if (docDefault) docDefault.classList.add('hidden');
-                } else {
-                    formPreview.classList.add('hidden');
-                    formPlaceholder.classList.remove('hidden');
-
-                    docImg.classList.add('hidden');
-                    if (docDefault) docDefault.classList.remove('hidden');
-                }
-            }
-
-            showToast('İmza başarıyla kaydedildi ve belgeye aktarıldı.', 'info');
-            closeSignatureModal();
         }
 
         // Form & Document Data Binding
@@ -851,18 +744,21 @@
         // Toggle Under 18 Mode
         function toggleUnder18Mode() {
             const isUnder18 = document.getElementById('inputUnder18').checked;
+            const notice = document.getElementById('under18Notice');
             const minorRow = document.getElementById('minorNameRow');
             const lblFullName = document.getElementById('lblFullName');
             const lblTcNo = document.getElementById('lblTcNo');
             const docSignerHeader = document.getElementById('docSignerHeader');
 
             if (isUnder18) {
+                notice.classList.remove('hidden');
                 minorRow.classList.remove('hidden');
                 lblFullName.innerText = "Veli / Vasi Adı Soyadı";
                 lblTcNo.innerText = "Veli / Vasi T.C. Kimlik No";
                 docSignerHeader.innerText = "Veli / Vasi (18 Yaş Altı Katılımcı)";
                 showToast('18 Yaş altı moduna geçildi. Veli bilgileri girilmelidir.', 'info');
             } else {
+                notice.classList.add('hidden');
                 minorRow.classList.add('hidden');
                 lblFullName.innerText = "Model Adı Soyadı";
                 lblTcNo.innerText = "T.C. Kimlik No";
@@ -882,19 +778,8 @@
         // Clear Form Fields
         function clearForm() {
             document.getElementById('interactiveForm').reset();
-            signatureData.model = null;
-            signatureData.photo = null;
-
-            document.getElementById('formModelSigPreview').classList.add('hidden');
-            document.getElementById('formModelSigPlaceholder').classList.remove('hidden');
-            document.getElementById('docSignatureImg').classList.add('hidden');
-            document.getElementById('docSignatureNull').classList.remove('hidden');
-
-            document.getElementById('formPhotoSigPreview').classList.add('hidden');
-            document.getElementById('formPhotoSigPlaceholder').classList.remove('hidden');
-            document.getElementById('docPhotoSignatureImg').classList.add('hidden');
-            document.getElementById('docPhotoSignatureDefault').classList.remove('hidden');
-
+            clearSignature('model');
+            clearSignature('photo');
             toggleUnder18Mode();
             updateDocument();
             showToast('Form verileri temizlendi.', 'info');
@@ -945,6 +830,7 @@
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
+            // Execute client-side PDF generation
             html2pdf().set(opt).from(element).save().then(() => {
                 showToast('PDF dosyası başarıyla oluşturuldu ve indirildi.', 'info');
             }).catch(err => {
@@ -974,222 +860,54 @@
             }, 300);
         }
 
-        // Send contract as PDF via WhatsApp (Web Share API for mobile + auto download for desktop)
-        async function sendPdfViaWhatsApp() {
-            const phoneInput = document.getElementById('inputPhone').value.trim();
-            const fullName = document.getElementById('inputFullName').value.trim();
-            const kvkkCheck = document.getElementById('inputKvkkCheck').checked;
+        // Copy text to clipboard using execCommand fallback
+        function copyDocumentText() {
+            const docElement = document.getElementById('printableDocument');
+            const textToCopy = docElement.innerText;
 
-            if (!fullName) {
-                showToast('Lütfen Model / Veli Ad Soyad alanını doldurunuz.', 'warning');
-                document.getElementById('inputFullName').focus();
-                return;
-            }
-
-            if (!kvkkCheck) {
-                showToast('Lütfen KVKK açık rıza onay kutucuğunu işaretleyiniz.', 'warning');
-                return;
-            }
-
-            if (!phoneInput) {
-                showToast('Lütfen mesajın gönderileceği telefon numarasını giriniz.', 'warning');
-                document.getElementById('inputPhone').focus();
-                return;
-            }
-
-            // Normalize phone number to international format (Turkey +90 default)
-            let cleanedPhone = phoneInput.replace(/\D/g, '');
-            if (cleanedPhone.startsWith('0')) {
-                cleanedPhone = '90' + cleanedPhone.substring(1);
-            } else if (cleanedPhone.length === 10 && cleanedPhone.startsWith('5')) {
-                cleanedPhone = '90' + cleanedPhone;
-            }
-
-            if (cleanedPhone.length < 10) {
-                showToast('Geçerli bir telefon numarası giriniz.', 'warning');
-                return;
-            }
-
-            showToast('PDF belgesi hazırlanıyor, lütfen bekleyiniz...', 'info');
-
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = textToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            
             try {
-                const element = document.getElementById('printableDocument');
-                const sanitizedName = fullName.replace(/[^a-zA-Z0-9çğıöşüÇĞİÖŞÜ_]/g, '_');
-                const fileName = `Foto_Cekim_Izn_KVKK_${sanitizedName}.pdf`;
-
-                const opt = {
-                    margin:       [8, 8, 8, 8],
-                    filename:     fileName,
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0 },
-                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
-
-                // Generate PDF as Blob
-                const worker = html2pdf().set(opt).from(element);
-                const pdfBlob = await worker.outputPdf('blob');
-                const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-
-                // Try Web Share API (Supported on iOS Safari, Android Chrome/Edge for native PDF sharing)
-                if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-                    showToast('WhatsApp / Paylaşım ekranı açılıyor...', 'success');
-                    await navigator.share({
-                        files: [pdfFile],
-                        title: 'Fotoğraf Çekim İzni ve KVKK Onam Formu',
-                        text: `Merhaba Sayın ${fullName}, Çekim İzni ve KVKK Onam Belgeniz PDF olarak ektedir.`
-                    });
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast('Sözleşme metni panoya kopyalandı.', 'info');
                 } else {
-                    // Fallback for Desktop Browsers (Web Browsers do not support direct file injection via URL)
-                    // Step 1: Auto-download the PDF
-                    const downloadUrl = URL.createObjectURL(pdfBlob);
-                    const link = document.createElement('a');
-                    link.href = downloadUrl;
-                    link.download = fileName;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(downloadUrl);
-
-                    // Step 2: Open WhatsApp Chat with pre-filled instruction text
-                    const waMessage = `Sayın *${fullName}*,
-
-Fotoğraf Çekim İzni ve KVKK Onam Belgeniz PDF olarak cihazınıza indirildi. 
-
-📌 *İndirilen Dosya:* ${fileName}
-
-Lütfen bu sohbet ekranındaki ataş (ekle) simgesine tıklayarak indirilen PDF dosyasını paylaşınız.
-
-_M. Akif Demirbaş | Freelancer Fotoğrafçılık_`;
-
-                    const waUrl = `https://api.whatsapp.com/send?phone=${cleanedPhone}&text=${encodeURIComponent(waMessage)}`;
-                    window.open(waUrl, '_blank');
-
-                    showToast('PDF cihaza indirildi ve WhatsApp sohbeti açıldı. Lütfen indirilen PDF dosyasını sohbetten ekleyiniz.', 'success', 6000);
+                    showToast('Kopyalama gerçekleştirilemedi.', 'warning');
                 }
             } catch (err) {
-                console.error('PDF paylaşım hatası:', err);
-                showToast('PDF oluşturulurken bir hata oluştu.', 'warning');
-            }
-        }
-
-        // Send contract details via WhatsApp (Text format)
-        function sendViaWhatsApp() {
-            const phoneInput = document.getElementById('inputPhone').value.trim();
-            const fullName = document.getElementById('inputFullName').value.trim() || 'Katılımcı';
-            const shootingDateVal = document.getElementById('inputShootingDate').value;
-            const location = document.getElementById('inputLocation').value.trim() || 'Belirtilmedi';
-            const concept = document.getElementById('inputConcept').value.trim() || 'Belirtilmedi';
-            const isUnder18 = document.getElementById('inputUnder18').checked;
-            const minorName = document.getElementById('inputMinorName').value.trim();
-            const consentText = document.getElementById('inputConsentText').value.trim() || 'Okudum, anladım, kabul ediyorum.';
-
-            if (!phoneInput) {
-                showToast('Lütfen mesajın gönderileceği telefon numarasını giriniz.', 'warning');
-                document.getElementById('inputPhone').focus();
-                return;
-            }
-
-            // Normalize phone number to international format (Turkey +90 default)
-            let cleanedPhone = phoneInput.replace(/\D/g, '');
-            if (cleanedPhone.startsWith('0')) {
-                cleanedPhone = '90' + cleanedPhone.substring(1);
-            } else if (cleanedPhone.length === 10 && cleanedPhone.startsWith('5')) {
-                cleanedPhone = '90' + cleanedPhone;
-            }
-
-            if (cleanedPhone.length < 10) {
-                showToast('Geçerli bir telefon numarası giriniz.', 'warning');
-                return;
-            }
-
-            let formattedDate = 'Belirtilmedi';
-            if (shootingDateVal) {
-                const dateObj = new Date(shootingDateVal);
-                formattedDate = dateObj.toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-            }
-
-            const modelTitle = isUnder18 ? `${minorName} (Veli: ${fullName})` : fullName;
-
-            const message = `📸 *M. Akif Demirbaş - Fotoğraf Çekim İzni ve KVKK Onam Belgesi*
-
-Sayın *${modelTitle}*,
-
-Çekim izni ve dijital onay detaylarınız aşağıdadır:
-
-📅 *Çekim Tarihi/Saat:* ${formattedDate}
-📍 *Lokasyon:* ${location}
-🎨 *Konsept / Proje:* ${concept}
-
-----------------------------------
-📄 *Sözleşme ve KVKK Özeti:*
-- 5846 sayılı FSEK kapsamında görsellerin sanatsal sergi, sosyal medya ve portfolyo platformlarında kullanımı.
-- 6698 sayılı KVKK kapsamında kişisel verilerin işlenmesine ilişkin açık rıza beyanı.
-- T.C. Kimlik numaranız gizli tutulacaktır.
-
-✍️ *Onay Beyanınız:* "${consentText}"
-
-_M. Akif Demirbaş | Freelancer Fotoğrafçılık_`;
-
-            const waUrl = `https://api.whatsapp.com/send?phone=${cleanedPhone}&text=${encodeURIComponent(message)}`;
-            window.open(waUrl, '_blank');
-            showToast('WhatsApp uygulamasına yönlendiriliyor...', 'success');
-        }
-
-        // Copy contract text to clipboard
-        function copyDocumentText() {
-            const docText = document.getElementById('printableDocument').innerText;
-            
-            const textarea = document.createElement('textarea');
-            textarea.value = docText;
-            textarea.style.position = 'fixed';
-            textarea.style.opacity = '0';
-            document.body.appendChild(textarea);
-            textarea.select();
-            
-            try {
-                document.execCommand('copy');
-                showToast('Sözleşme metni panoya kopyalandı.', 'info');
-            } catch (err) {
-                showToast('Kopyalama başarısız oldu.', 'warning');
+                showToast('Kopyalama sırasında bir hata oluştu.', 'warning');
             } finally {
-                document.body.removeChild(textarea);
+                document.body.removeChild(tempTextArea);
             }
         }
 
-        // Toast Notification System
+        // Toast Notification Function
         function showToast(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
 
-            let bgClass = "bg-slate-900 text-white";
-            let iconName = "info";
+            toastMessage.innerText = message;
 
             if (type === 'warning') {
-                bgClass = "bg-amber-600 text-white";
-                iconName = "alert-triangle";
-            } else if (type === 'success') {
-                bgClass = "bg-emerald-600 text-white";
-                iconName = "check-circle";
+                toastIcon.setAttribute('data-lucide', 'alert-triangle');
+                toastIcon.className = "w-5 h-5 text-amber-400";
+            } else {
+                toastIcon.setAttribute('data-lucide', 'check-circle-2');
+                toastIcon.className = "w-5 h-5 text-emerald-400";
             }
-
-            toast.className = `px-4 py-3 rounded-xl shadow-xl ${bgClass} text-xs font-medium flex items-center space-x-2 border border-white/10 transform transition-all duration-300 opacity-0 translate-y-2 pointer-events-auto max-w-sm`;
-            toast.innerHTML = `<i data-lucide="${iconName}" class="w-4 h-4 flex-shrink-0"></i><span>${message}</span>`;
-
-            container.appendChild(toast);
             lucide.createIcons();
 
-            requestAnimationFrame(() => {
-                toast.classList.remove('opacity-0', 'translate-y-2');
-            });
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
 
             setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => {
-                    if (toast.parentNode) {
-                        toast.parentNode.removeChild(toast);
-                    }
-                }, 300);
-            }, 3500);
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
         }
     </script>
 </body>
