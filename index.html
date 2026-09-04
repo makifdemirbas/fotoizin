@@ -486,45 +486,73 @@
         </section>
     </main>
 
-    <!-- WhatsApp Share Guidance Modal (Fallback for Desktop or non-native share) -->
+    <!-- WhatsApp Share Guidance Modal (Mobile & Desktop Dual Support) -->
     <div id="whatsappModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100 animate-in fade-in zoom-in duration-200">
-            <div class="flex items-center space-x-3 text-emerald-600">
-                <div class="bg-emerald-100 p-2.5 rounded-xl">
-                    <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
-                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                    </svg>
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 border border-slate-100 animate-in fade-in zoom-in duration-200">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center space-x-3 text-emerald-600">
+                    <div class="bg-emerald-100 p-2.5 rounded-xl">
+                        <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base">WhatsApp ile PDF İletimi</h3>
+                        <p class="text-xs text-slate-500" id="waRecipientSummary">Alıcı: Hazırlanıyor</p>
+                    </div>
                 </div>
-                <div>
-                    <h3 class="font-bold text-slate-900 text-base">PDF İndirildi & WhatsApp Hazır!</h3>
-                    <p class="text-xs text-slate-500">Masaüstü ve tarayıcı yönlendirmesi</p>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Workflow Visualizer -->
+            <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                <div class="p-2 bg-emerald-50 text-emerald-800 rounded-xl border border-emerald-200">
+                    <span class="block font-bold">1. Adım</span>
+                    <span class="text-[11px]">PDF İndirildi</span>
+                </div>
+                <div class="p-2 bg-slate-100 text-slate-800 rounded-xl border border-slate-200">
+                    <span class="block font-bold">2. Adım</span>
+                    <span class="text-[11px]">Sohbeti Aç</span>
+                </div>
+                <div class="p-2 bg-slate-100 text-slate-800 rounded-xl border border-slate-200">
+                    <span class="block font-bold">3. Adım</span>
+                    <span class="text-[11px]">PDF'i Ekle & Gönder</span>
                 </div>
             </div>
 
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-700 space-y-2">
-                <p class="font-semibold text-slate-900 flex items-center gap-1.5">
-                    <span class="w-5 h-5 bg-emerald-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold">1</span>
-                    PDF cihazınıza başarıyla indirildi.
-                </p>
-                <p class="font-semibold text-slate-900 flex items-center gap-1.5">
-                    <span class="w-5 h-5 bg-emerald-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold">2</span>
-                    Aşağıdaki butona basarak WhatsApp sohbetini açınız.
-                </p>
-                <p class="text-slate-500 pl-6">
-                    Açılan WhatsApp sohbetinde ataç/ekle butonuna basarak indirdiğiniz PDF dosyasını sohbete ekleyip gönderebilirsiniz.
-                </p>
+            <!-- Context message box -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-semibold text-slate-600 uppercase tracking-wider">Otomatik Hazırlanan WhatsApp Mesajı:</span>
+                    <button type="button" onclick="copyWhatsAppTextMessage()" class="text-emerald-700 hover:text-emerald-800 text-xs flex items-center gap-1 font-medium transition">
+                        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                        <span>Kopyala</span>
+                    </button>
+                </div>
+                <div id="waPreparedTextPreview" class="text-xs text-slate-700 font-mono bg-white p-2.5 rounded-lg border border-slate-200 max-h-24 overflow-y-auto whitespace-pre-wrap leading-relaxed"></div>
             </div>
 
-            <div class="flex flex-col gap-2 pt-2">
-                <button id="modalOpenWhatsAppBtn" type="button" class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition flex items-center justify-center space-x-2">
-                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <!-- Direct Actions -->
+            <div class="space-y-2 pt-1">
+                <button id="modalOpenWhatsAppBtn" type="button" class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-md transition flex items-center justify-center space-x-2">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
                         <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
                     </svg>
                     <span>WhatsApp Sohbetini Aç</span>
                 </button>
-                <button type="button" onclick="closeModal()" class="w-full py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-xs transition">
-                    Pencereyi Kapat
-                </button>
+
+                <div class="flex gap-2">
+                    <button type="button" onclick="downloadPDF()" class="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-xs transition flex items-center justify-center gap-1.5">
+                        <i data-lucide="file-down" class="w-4 h-4"></i>
+                        <span>PDF'i Yeniden İndir</span>
+                    </button>
+                    <button type="button" onclick="closeModal()" class="py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-xs transition">
+                        Kapat
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -877,14 +905,37 @@
             });
         }
 
-        // WHATSAPP SHARE IMPLEMENTATION
+        // Format Turkish phone numbers properly for international WhatsApp URLs
+        function formatTurkishWhatsAppPhone(rawPhone) {
+            let clean = (rawPhone || '').replace(/[^0-9]/g, '');
+            if (!clean) return '';
+            if (clean.startsWith('90') && clean.length === 12) {
+                return clean;
+            }
+            if (clean.startsWith('0') && clean.length === 11) {
+                return '90' + clean.substring(1);
+            }
+            if (clean.length === 10) {
+                return '90' + clean;
+            }
+            return clean;
+        }
+
+        // Generate WhatsApp notification text
+        function generateWhatsAppMessageText() {
+            const fullName = document.getElementById('inputFullName').value.trim() || 'Model';
+            const concept = document.getElementById('inputConcept').value.trim() || 'Fotoğraf Çekimi';
+            const location = document.getElementById('inputLocation').value.trim() || 'Belirtilmedi';
+            const dateStr = document.getElementById('docShootingDate').innerText;
+
+            return `Sayın ${fullName},\n\nM. Akif Demirbaş ile gerçekleştirilen çekime ait "Fotoğraf Çekim İzni ve KVKK Onam Formu" düzenlenmiştir.\n\n📅 Çekim Tarihi: ${dateStr}\n📍 Mekân: ${location}\n📷 Konsept: ${concept}\n\nİmzalı resmi PDF belgeniz ektedir.`;
+        }
+
+        // WHATSAPP SHARE IMPLEMENTATION (Mobile Native Web Share + Desktop WhatsApp Web)
         async function sharePDFViaWhatsApp() {
             const fullName = document.getElementById('inputFullName').value.trim();
             const kvkkCheck = document.getElementById('inputKvkkCheck').checked;
             const rawPhone = document.getElementById('inputPhone').value.trim();
-            const concept = document.getElementById('inputConcept').value.trim() || 'Fotoğraf Çekimi';
-            const location = document.getElementById('inputLocation').value.trim() || 'Belirtilmedi';
-            const dateStr = document.getElementById('docShootingDate').innerText;
 
             if (!fullName) {
                 showToast('Lütfen Model / Veli Ad Soyad alanını doldurunuz.', 'warning');
@@ -895,17 +946,10 @@
                 return;
             }
 
-            showToast('PDF WhatsApp için hazırlanıyor...', 'info');
+            showToast('PDF hazırlanıyor ve WhatsApp bağlantısı kuruluyor...', 'info');
 
-            // Format phone number for WhatsApp wa.me link
-            let cleanPhone = rawPhone.replace(/[^0-9]/g, '');
-            if (cleanPhone.startsWith('0')) {
-                cleanPhone = '90' + cleanPhone.substring(1);
-            } else if (cleanPhone.length === 10) {
-                cleanPhone = '90' + cleanPhone;
-            }
-
-            const messageText = `Sayın ${fullName},\n\nM. Akif Demirbaş ile gerçekleştirilen çekime ait "Fotoğraf Çekim İzni ve KVKK Onam Formu" düzenlenmiştir.\n\n📅 Çekim Tarihi: ${dateStr}\n📍 Mekân: ${location}\n📷 Konsept: ${concept}\n\nİmzalı PDF belgeniz ektedir.`;
+            const cleanPhone = formatTurkishWhatsAppPhone(rawPhone);
+            const messageText = generateWhatsAppMessageText();
             const encodedMsg = encodeURIComponent(messageText);
             const waUrl = cleanPhone 
                 ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodedMsg}`
@@ -915,47 +959,73 @@
             const { filename, opt } = getPdfConfig();
 
             try {
-                // Generate PDF as Blob
-                const worker = html2pdf().from(element).set(opt);
-                const pdfBlob = await worker.output('blob');
-                const pdfFile = new File([pdfBlob], filename, { type: 'application/pdf' });
+                // Try to create PDF Blob
+                let pdfFile = null;
+                try {
+                    const pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob');
+                    if (pdfBlob) {
+                        pdfFile = new File([pdfBlob], filename, { type: 'application/pdf' });
+                    }
+                } catch (blobErr) {
+                    console.warn('Direct blob generation fallback:', blobErr);
+                }
 
-                // Check if device supports Web Share API with files (Mobile Chrome, iOS Safari, etc.)
-                if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+                // 1. MOBILE NATIVE SHARE (iOS Safari, Android Chrome, etc.)
+                if (pdfFile && navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
                     try {
                         await navigator.share({
                             files: [pdfFile],
                             title: 'Fotoğraf Çekim İzni ve KVKK Onam Formu',
                             text: messageText
                         });
-                        showToast('Belge paylaşım menüsüne aktarıldı. WhatsApp seçebilirsiniz.', 'info');
+                        showToast('Paylaşım menüsü açıldı. WhatsApp uygulamasını seçebilirsiniz.', 'info');
                         return;
                     } catch (shareErr) {
                         if (shareErr.name === 'AbortError') {
-                            // User cancelled share dialog
-                            return;
+                            return; // User intentionally dismissed native sheet
                         }
-                        console.warn('Share API error, trying fallback:', shareErr);
+                        console.warn('Native share threw error, continuing with desktop modal:', shareErr);
                     }
                 }
 
-                // Fallback for Desktop Browsers / Unsupported Share API:
-                // 1. Download the PDF directly so user has the file
+                // 2. DESKTOP / WEB BROWSER WORKFLOW
+                // Browsers cannot automatically push binary files into arbitrary third-party web apps via URLs.
+                // We automatically download the PDF, prepare the direct WhatsApp chat, and guide the user seamlessly.
                 await html2pdf().set(opt).from(element).save();
 
-                // 2. Setup and display WhatsApp Guidance Modal
+                // Update Modal Content
+                document.getElementById('waRecipientSummary').innerText = cleanPhone 
+                    ? `Alıcı: ${fullName} (+${cleanPhone})`
+                    : `Alıcı: ${fullName} (Sohbet Seçilecek)`;
+                document.getElementById('waPreparedTextPreview').innerText = messageText;
+
                 const openBtn = document.getElementById('modalOpenWhatsAppBtn');
                 openBtn.onclick = function() {
                     window.open(waUrl, '_blank');
-                    closeModal();
                 };
 
                 document.getElementById('whatsappModal').classList.remove('hidden');
-                showToast('PDF indirildi. WhatsApp sohbetine ekleyebilirsiniz.', 'info');
+                showToast('PDF indirildi! WhatsApp sohbetini açıp dosyayı ekleyebilirsiniz.', 'info');
 
             } catch (err) {
                 console.error('WhatsApp paylaşım hatası:', err);
-                showToast('PDF hazırlanırken hata oluştu. Doğrudan PDF İndir seçeneğini kullanabilirsiniz.', 'warning');
+                showToast('PDF oluşturulurken bir aksaklık oluştu, doğrudan PDF İndir butonunu deneyebilirsiniz.', 'warning');
+            }
+        }
+
+        function copyWhatsAppTextMessage() {
+            const messageText = generateWhatsAppMessageText();
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = messageText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            try {
+                document.execCommand('copy');
+                showToast('WhatsApp mesaj metni panoya kopyalandı.', 'info');
+            } catch (err) {
+                showToast('Metin kopyalanamadı.', 'warning');
+            } finally {
+                document.body.removeChild(tempTextArea);
             }
         }
 
